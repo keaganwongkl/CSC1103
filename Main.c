@@ -7,6 +7,7 @@ using namespace std;
 
 // Name of the players
 string PLAYER1, PLAYER2;
+char MODE;
 
 // Function to show the current
 // board status
@@ -15,22 +16,22 @@ void showBoard(char board[][SIDE])
 	printf("\n\n");
 
 	printf("\t\t\t %c | %c | %c \n",
-		board[0][0],
-		board[0][1],
-		board[0][2]); // Printing tictactoe board row by row
+		   board[0][0],
+		   board[0][1],
+		   board[0][2]); // Printing tictactoe board row by row
 
 	printf("\t\t\t------------\n");
 
 	printf("\t\t\t %c | %c | %c \n",
-		board[1][0],
-		board[1][1],
-		board[1][2]);
+		   board[1][0],
+		   board[1][1],
+		   board[1][2]);
 
 	printf("\t\t\t------------\n");
 	printf("\t\t\t %c | %c | %c \n\n",
-		board[2][0],
-		board[2][1],
-		board[2][2]);
+		   board[2][0],
+		   board[2][1],
+		   board[2][2]);
 
 	return;
 }
@@ -41,8 +42,8 @@ void showInstructions()
 	printf("\t\t\t Tic-Tac-Toe\n\n");
 
 	printf("Choose a cell numbered "
-		"from 1 to 9 as below"
-		" and play\n\n");
+		   "from 1 to 9 as below"
+		   " and play\n\n");
 
 	printf("\t\t\t 1 | 2 | 3 \n");
 	printf("\t\t\t------------\n");
@@ -51,7 +52,7 @@ void showInstructions()
 	printf("\t\t\t 7 | 8 | 9 \n\n");
 
 	printf("-\t-\t-\t-\t-\t"
-		"-\t-\t-\t-\t-\n\n");
+		   "-\t-\t-\t-\t-\n\n");
 
 	return;
 }
@@ -67,7 +68,8 @@ void initialise(char board[][SIDE],
 
 	// Initially the board is empty
 	// Building the board
-	for (int i = 0; i < SIDE; i++) {
+	for (int i = 0; i < SIDE; i++)
+	{
 		for (int j = 0; j < SIDE; j++)
 			board[i][j] = ' ';
 	}
@@ -78,7 +80,7 @@ void initialise(char board[][SIDE],
 
 	// randomise the moves
 	random_shuffle(moves,
-				moves + SIDE * SIDE);
+				   moves + SIDE * SIDE);
 
 	return;
 }
@@ -98,10 +100,9 @@ void declareWinner(string whoseTurn)
 // the same player's move
 bool rowCrossed(char board[][SIDE])
 {
-	for (int i = 0; i < SIDE; i++) {
-		if (board[i][0] == board[i][1]
-			&& board[i][1] == board[i][2]
-			&& board[i][0] != ' ')
+	for (int i = 0; i < SIDE; i++)
+	{
+		if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != ' ')
 			return (true);
 	}
 	return (false);
@@ -112,10 +113,9 @@ bool rowCrossed(char board[][SIDE])
 // same player's move
 bool columnCrossed(char board[][SIDE])
 {
-	for (int i = 0; i < SIDE; i++) {
-		if (board[0][i] == board[1][i]
-			&& board[1][i] == board[2][i]
-			&& board[0][i] != ' ')
+	for (int i = 0; i < SIDE; i++)
+	{
+		if (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != ' ')
 			return (true);
 	}
 	return (false);
@@ -126,14 +126,10 @@ bool columnCrossed(char board[][SIDE])
 // the same player's move
 bool diagonalCrossed(char board[][SIDE])
 {
-	if (board[0][0] == board[1][1]
-		&& board[1][1] == board[2][2]
-		&& board[0][0] != ' ')
+	if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != ' ')
 		return (true);
 
-	if (board[0][2] == board[1][1]
-		&& board[1][1] == board[2][0]
-		&& board[0][2] != ' ')
+	if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != ' ')
 		return (true);
 
 	return (false);
@@ -143,9 +139,7 @@ bool diagonalCrossed(char board[][SIDE])
 // game is over else it returns a false
 bool gameOver(char board[][SIDE])
 {
-	return (rowCrossed(board)
-			|| columnCrossed(board)
-			|| diagonalCrossed(board));
+	return (rowCrossed(board) || columnCrossed(board) || diagonalCrossed(board));
 }
 
 // Function to play Tic-Tac-Toe
@@ -167,9 +161,10 @@ void playTicTacToe(string whoseTurn)
 
 	// Keep playing till the game is
 	// over or it is a draw
-	while (gameOver(board) == false
-		&& moveIndex != SIDE * SIDE) {
-		if (whoseTurn == PLAYER1) {
+	while (gameOver(board) == false && moveIndex != SIDE * SIDE)
+	{
+		if (whoseTurn == PLAYER1)
+		{
 
 		// Label for player1 wrong choice
 		// of row and column
@@ -179,33 +174,36 @@ void playTicTacToe(string whoseTurn)
 			// column by player 1 to
 			// insert X
 			cout << PLAYER1
-				<< " Enter the respective"
-				<< " row and column to "
+				 << " Enter the respective"
+				 << " row and column to "
 					"insert X :\n";
 			cin >> r >> c;
 
-			if (r <= 3 && c <= 3) {
+			if (r <= 3 && c <= 3)
+			{
 
 				// To check desired row and
 				// column should be empty
-				if (board[r - 1] == ' ')
-					board[r - 1] = 'X';
+				if (board[r - 1][c - 1] == ' ')
+					board[r - 1][c - 1] = 'X';
 
 				// If input is on already
 				// filled position
-				else {
+				else
+				{
 					cout << "You cannot Overlap"
-						<< " on Already "
+						 << " on Already "
 							"filled position:\n";
 					goto player1;
 				}
 			}
 
 			// Input is not valid
-			else {
+			else
+			{
 				cout << "\nInput is not "
-					<< "valid please enter "
-					<< "right one\n";
+					 << "valid please enter "
+					 << "right one\n";
 
 				goto player1;
 			}
@@ -215,7 +213,8 @@ void playTicTacToe(string whoseTurn)
 			whoseTurn = PLAYER2;
 		}
 
-		else if (whoseTurn == PLAYER2) {
+		else if (whoseTurn == PLAYER2 && MODE == '1')
+		{
 
 		// Label for player2 wrong choice
 		// of row and column
@@ -225,35 +224,65 @@ void playTicTacToe(string whoseTurn)
 			// column by player 1 to
 			// insert X
 			cout << PLAYER2
-				<< " Enter the respective"
-				<< " row and column to "
+				 << " Enter the respective"
+				 << " row and column to "
 					"insert O :";
 			cin >> r >> c;
-			if (r <= 3 && c <= 3) {
+			if (r <= 3 && c <= 3)
+			{
 
 				// Input the desired row and
 				// column by player 1 to
 				// insert X
-				if (board[r - 1] == ' ')
-					board[r - 1] = 'O';
+				if (board[r - 1][c - 1] == ' ')
+					board[r - 1][c - 1] = 'O';
 
 				// If input is on already
 				// filled position
-				else {
+				else
+				{
 					cout << "You cannot Overlap"
-						<< " on Already "
-						<< "filled position:\n";
+						 << " on Already "
+						 << "filled position:\n";
 					goto player2;
 				}
 			}
 
 			// Input is not valid
-			else {
+			else
+			{
 				cout << "\nInput is not "
-					<< "valid please enter "
-					<< "right one :\n";
+					 << "valid please enter "
+					 << "right one :\n";
 				goto player2;
 			}
+
+			showBoard(board);
+			moveIndex++;
+			whoseTurn = PLAYER1;
+		}
+	
+		else if (whoseTurn == PLAYER2 && MODE == '0') // FOR COMPUTER INPUT
+		{
+
+		// Label for computer wrong choice
+		// of row and column
+		computer:
+
+			// The random postion plot by the computer
+			r = rand() % 3;
+			c = rand() % 3;
+
+				// Checks if position plot by computer is already taken
+				if (board[r][c] == ' ') {
+					board[r][c] = 'O';
+					cout << "\n Computer has made its move, its now your turn";
+				}
+
+				// If input is on already
+				// filled position
+				else
+					goto computer;
 
 			showBoard(board);
 			moveIndex++;
@@ -262,10 +291,10 @@ void playTicTacToe(string whoseTurn)
 	}
 
 	// If the game has drawn
-	if (gameOver(board) == false
-		&& moveIndex == SIDE * SIDE)
+	if (gameOver(board) == false && moveIndex == SIDE * SIDE)
 		printf("It's a draw\n");
-	else {
+	else
+	{
 
 		// Toggling the user to declare
 		// the actual winner
@@ -283,36 +312,61 @@ void playTicTacToe(string whoseTurn)
 // Driver Code
 int main()
 {
-	// Take the name of players
-	cout << "Enter name of first Player: ";
-	cin >> PLAYER1;
+	// Select player mode
+	do
+	{
+		cout << "Play against a computer or player (Enter 0 for Computer, Enter 1 for player): ";
+		scanf("%c", &MODE);
+		//cin >> MODE;
+		// Play against a computer mode
+		if (MODE == '0')
+		{
+			cout << "Enter name of Player: ";
+			cin >> PLAYER1;
 
-	cout << "Enter name of Second Player: ";
-	cin >> PLAYER2;
+			PLAYER2 = "COMPUTER";
+		}
 
-	// Use current time as seed for
-	// random generator
-	srand(time(0));
+		// Play against a player mode
+		else if (MODE == '1')
+		{
+			// Take the name of players
+			cout << "Enter name of first Player: ";
+			cin >> PLAYER1;
 
-	// Lets do toss
-	int toss = rand() % 2;
+			cout << "Enter name of Second Player: ";
+			cin >> PLAYER2;
+		}
+		
+		else
+			continue;
 
-	// Let us play the game
-	if (toss == 1) {
-		cout << "Player "
-			<< PLAYER1
-			<< " win the toss"
-			<< endl;
+		// Use current time as seed for
+		// random generator
+		srand(time(0));
 
-		playTicTacToe(PLAYER1);
+		// Lets do toss
+		int toss = rand() % 2;
+
+		// Let us play the game
+		if (toss == 1)
+		{
+			cout << "Player "
+					<< PLAYER1
+					<< " win the toss"
+					<< endl;
+			playTicTacToe(PLAYER1);
+		}
+		else
+		{
+			cout << "Player "
+					<< PLAYER2
+					<< " win the toss"
+					<< endl;
+			playTicTacToe(PLAYER2);
+		}
+		return (0);
 	}
-	else {
-		cout << "Player "
-			<< PLAYER2
-			<< " win the toss"
-			<< endl;
-		playTicTacToe(PLAYER2);
-	}
 
-	return (0);
+	while (1); // CHECK IF THIS LOGIC WORKS ACCORDINGLY
 }
