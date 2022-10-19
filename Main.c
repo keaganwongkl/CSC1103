@@ -41,15 +41,14 @@ void showInstructions()
 {
 	printf("\t\t\t Tic-Tac-Toe\n\n");
 
-	printf("Choose a cell numbered "
-		   "from 1 to 9 as below"
-		   " and play\n\n");
+	printf("Enter rows 1 to 3 and columns 1 to 3\n\n");
 
-	printf("\t\t\t 1 | 2 | 3 \n");
-	printf("\t\t\t------------\n");
-	printf("\t\t\t 4 | 5 | 6 \n");
-	printf("\t\t\t------------\n");
-	printf("\t\t\t 7 | 8 | 9 \n\n");
+	printf("\t\t\t    1   2   3 \n");
+	printf("\t\t\t 1    |   |   \n");
+	printf("\t\t\t   ------------\n");
+	printf("\t\t\t 2    |   |   \n");
+	printf("\t\t\t   ------------\n");
+	printf("\t\t\t 3    |   |   \n\n");
 
 	printf("-\t-\t-\t-\t-\t"
 		   "-\t-\t-\t-\t-\n\n");
@@ -173,11 +172,10 @@ void playTicTacToe(string whoseTurn)
 			// Input the desired row and
 			// column by player 1 to
 			// insert X
-			cout << PLAYER1
-				 << " Enter the respective"
-				 << " row and column to "
-					"insert X :\n";
-			cin >> r >> c;
+			printf("Enter a row:");
+			scanf(" %d", &r);			
+			printf("Enter a column:");
+			scanf(" %d", &c);
 
 			if (r <= 3 && c <= 3)
 			{
@@ -223,11 +221,11 @@ void playTicTacToe(string whoseTurn)
 			// Input the desired row and
 			// column by player 1 to
 			// insert X
-			cout << PLAYER2
-				 << " Enter the respective"
-				 << " row and column to "
-					"insert O :";
-			cin >> r >> c;
+			printf("Enter a row:");
+			scanf(" %d", &r);			
+			printf("Enter a column:");
+			scanf(" %d", &c);
+
 			if (r <= 3 && c <= 3)
 			{
 
@@ -276,7 +274,7 @@ void playTicTacToe(string whoseTurn)
 				// Checks if position plot by computer is already taken
 				if (board[r][c] == ' ') {
 					board[r][c] = 'O';
-					cout << "\n Computer has made its move, its now your turn";
+					cout << "\n The Computer has made its move, its now your turn";
 				}
 
 				// If input is on already
@@ -321,9 +319,7 @@ int main()
 		// Play against a computer mode
 		if (MODE == '0')
 		{
-			cout << "Enter name of Player: ";
-			cin >> PLAYER1;
-
+			PLAYER1 = "PLAYER 1";
 			PLAYER2 = "COMPUTER";
 		}
 
@@ -331,11 +327,8 @@ int main()
 		else if (MODE == '1')
 		{
 			// Take the name of players
-			cout << "Enter name of first Player: ";
-			cin >> PLAYER1;
-
-			cout << "Enter name of Second Player: ";
-			cin >> PLAYER2;
+			PLAYER1 = "PLAYER 1";
+			PLAYER2 = "PLAYER 2";
 		}
 		
 		else
