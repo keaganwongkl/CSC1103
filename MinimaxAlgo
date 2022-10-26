@@ -1,3 +1,6 @@
+//STILL NEEDS TO CHANGE VARIABLE NAME ETC
+
+
 #include <stdio.h>
 
 #define X -1 //defines X to allow change of turn
