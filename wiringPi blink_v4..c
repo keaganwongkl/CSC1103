@@ -6,12 +6,12 @@
 #include <stdlib.h>
 #include <math.h>
 
-int start(void);
-int stop(void);
-void pwmpulse(float brightnes);
+int start();
+int stop();
+void pwmpulse(float brightness);
 void RedOffOn(int i);
 void RedOnOff(int i);
-void pulse(void);
+void pulse();
 
 #define red 7 //physical pin no.7
 #define green 1 //physical pin no.12
@@ -19,49 +19,51 @@ void pulse(void);
 int main(int argc, char *argv[]) //accepts only 2 arguments (inclusive of program name)
 {
 
-if (atoi(argv[1])==0) //if condition for number 0
-{
-	stop();
-}
-else if (atoi(argv[1]) == 1)   //if condition for number 1
-{
-	start();
-}
-else if (atoi(argv[1])==2) //pulses twice every second until stopped
-{
-	printf("Hold Ctrl + C to stop pulse.\n");
-	do
-	{
-    	pulse();
-	}
-		while(atoi(argv[1])==2);
-}
-
-else if (atoi(argv[1])==3)
-{
-  printf ("Hold Ctrl + C to stop pulse. You can change the brightness level of the green LED from 1-1024 as well.\n");
-  do
-	{
-        wiringPiSetup();
-        pinMode (1, PWM_OUTPUT) ;
-        for (;;)   
-        {
-            pwmpulse(256);  //can input whatever brightness level we want, 1024 for max brightness. AKA matching 1 in pinMode set
-        }
-        return 0 ;
-	} while(atoi(argv[1])==3);
+  if (atoi(argv[1])==0) //if condition for number 0
+  {
+    stop();
+  }
+  else if (atoi(argv[1]) == 1)   //if condition for number 1
+  {
+    start();
+  }
+  else if (atoi(argv[1])==2) //pulses twice every second until stopped
+  {
+    printf("Press Ctrl + C to stop pulse.\n");
+    do
+    {
+        pulse();
+    }
+      while(atoi(argv[1])==2);
+  }
+  else if (atoi(argv[1])==3)
+  {
+    printf ("Press Ctrl + C to stop pulse. You can change the brightness level of the green LED from 1-1024 as well.\n");
+    do
+    {
+          wiringPiSetup();
+          pinMode(1, PWM_OUTPUT);
+          for (;;)   
+          {
+              pwmpulse(256);  //can input whatever brightness level we want, 1024 for max brightness. AKA matching 1 in pinMode set
+          }
+          return 0 ;
+    } 
+    while(atoi(argv[1])==3);
+    
+  }
   return 0;
-}
-}
+} /*End of main function*/
 
 
-int start(void) //start(); function to turn on both the LEDs
+int start() //start(); function to turn on both the LEDs
 {
 	  wiringPiSetup(); //initialises the usage of the wiringPi functions
 	  pinMode(red, OUTPUT); //Tells the compiler which pin the red LED is at specifically, and set it to have an output signal
 	  pinMode(green, OUTPUT);//Tells the compiler which pin the green LED is at specifically, and set it to have an output signal
 	  digitalWrite(red, 1);  //turn on red LED
 	  digitalWrite(green, 1); //turn off green LED
+    /*For the above line "turn off green LED", is it suppose to be on or off?*/
 	  return 0; //returns 0 to start(); function to let it know that the function has finished execution
 }
 
@@ -71,18 +73,19 @@ int stop(void) //stop(); function to turn off both the LEDs
 	  pinMode(red, OUTPUT); //Tells the compiler which pin the red LED is at specifically, and set it to have an output signal
 	  pinMode(green, OUTPUT);//Tells the compiler which pin the green LED is at specifically, and set it to have an output signal
 	  digitalWrite(red, 0);  //turn on red LED 
+    /*For the above is it to turn the red LED off instead of on?*/
 	  digitalWrite(green, 0); //turn off green LED
 	  return 0; //returns 0 to stop(); function to let it know that the function has finished execution
 }
 
-void pwmpulse(float brightnes) //2 red blinks : 1 green change
+void pwmpulse(float brightness) //2 red blinks : 1 green change
 {
     digitalWrite(red,1);  //turns the red LED on
-    pwmWrite(green, brightnes); //turns on green LED in PWM mode at entered parameter brightness level
+    pwmWrite(green, brightness); //turns on green LED in PWM mode at entered parameter brightness level
     delay(62.5); //delays the next line by 62.5 milliseconds.
     RedOffOn(2); //turns red LED off and then waits 62.5milliseconds, turns it back on. Then waits 62.5 milliseconds again
-    digitalWrite(red, 0);
-    pwmWrite(green, 0);
+    digitalWrite(red, 0); //Dallon Question: Set Red LED to off
+    pwmWrite(green, 0); //Dallon Question: Set Green LED to off
     delay(62.5);
     RedOnOff(2);
 }
