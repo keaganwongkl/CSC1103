@@ -1,0 +1,216 @@
+//BEGIN, END, READ,PRINT,IF,
+//ELSE,ELSEIF,ENDIF,WHILE,DO,ENDWHILE AND ENDDO
+
+BEGIN
+    X <- -1
+    O <- -2
+    MAX_SIZE <- 50
+    turn <- O
+    board <- {1,2,3,4,5,6,7,8,9}
+    variations <- 0
+
+    function copyBoard(argument 1, argument 2){
+        while i < 9
+            i <- i+1
+    }
+
+    function getl(argument 1, argument 2){
+        while i < argument 2 and argument 1 has'\n'
+            i++
+        return i
+    }
+
+    function bufferToNum(array[]){
+        while buffer is array[]
+        convert buffer to int
+        return int value
+    }
+
+    function boardToChar(argument 1)
+        if board <- x
+            return x
+        elseif board <- O
+            return O
+        else 
+            return 0
+
+    function printBoard(){
+        print grid layout
+        layout <- boardToChar()
+    }
+
+    function alternateTurn(){
+        if turn <- O
+            turn <- X
+        if turn <- X
+            turn <- O
+    }
+
+    function drawCheck(argument 1){
+        while i < 9
+        if array[] <- i+1
+            return 0
+        else
+            return 1
+    }
+
+    function winCheck(array[]){
+        while i<3
+            if array[] <- rowwin[]
+            return array[]
+        while i<3
+            if array[] <- columnwin[]
+            return array[]
+        if array[] <- diagonalLRwin[]
+            return array[]
+
+        if array[] <- diagnoalRLwin[]
+            return array[]
+
+        return 0
+    
+    function putInBoard(array[],argument 2, argument 3){
+        if array[] <- argument 2 +1
+            array[] = argument 3
+            return 1
+        else
+            return 0
+    }
+
+    function gameState(array[]){
+        wc <- winCheck(array[])
+
+        if wc <- X
+            return X
+        else if wc <- O
+            return O
+        else
+            if drawCheck(array[]){
+                return 0
+            }
+
+    }
+
+    function legalMoves(array[],array2[]){
+        while i < 9
+            if array[i] <- i+1
+                array2[i] <- 1
+            else
+                array2[i] <- 0
+
+    }
+
+    function max(argument 1, argument 2){
+        return a > b ? a : b
+    }
+
+    function min(argument 1, argument 2){
+        return a < b ? a : b
+    }
+
+    function minimax(array[], argument 2, argument 3){
+        gs <- gameState(array[])
+        variations++
+
+        if gs <- X
+            return 10
+        else if gs <- O
+            return -10
+        else if gs <- 0
+            return 0
+
+        if argument 2 <- 0
+            return 0
+
+        if maximising{
+            val <- -100
+            legalMovesArr[9]
+            legalMoves(array[],legalMovesArr[])
+
+            while i<9
+                if legalMovesArr[i]
+                tempBoard[9]
+                copyBoard(array[], tempBoard)
+                putInBoard(tempBoard, i, x)
+                val <- max(minimax(tempBoard,depth - 1,0), val)
+        }
+        return val
+    }
+        else
+            val <- 100
+            legalMovesArr[9]
+            copyBoard(array[],legalMovesArr)
+            while i < 9
+                if legalMovesArr[i]
+                    tempBoard[9]
+                    copyBoard(array[],tempBoard)
+                    putInBoard(tempBoard, i, o)
+                    val <- min(minimax(tempBoard, argument 2 - 1, 1), val)
+            return val
+    }
+
+    function ai(array[],argument 2){
+        legalMovesArr[9]
+        legalMoves(board,legalMovesArr)
+        val <- -100
+        best_move <- 0
+        while i < 9
+            if legalMovesArr[i]
+            tempBoard[9]
+            copyBoard(array[],tempBoard)
+            putInBoard(tempBoard,i,x)
+            temp <- minimax(tempBoard,argument 2 - 1,0)
+            if val <= temp
+                val <- temp
+                best_move <- i
+        
+        return best_move
+    }
+
+    function main(){
+        printBoard
+        gameOn <- 0
+        buffer[]
+        
+        while !gameOn
+            if turn <- O
+                print "It is x/o's turn"
+                read (buffer, MAX_SIZE)
+                num = bufferToNum(buffer)
+                while num <= 0 || num > 9
+                    print "Please enter valid integer"
+                    read (buffer, MAX_SIZE)
+                    num = bufferToNum(buffer)
+                
+                if(putInBoard(board, num-1, turn))
+
+                else
+                    while !putInBoard(board, num-1, turn)
+                    print "Something already exist"
+                    read (buffer, MAX_SIZE)
+                    num = bufferToNum(buffer)
+
+            else    
+                putInBoard(board,ai(board,8),X)
+                print "Number of variables"
+                variations <- 0
+
+            printBoard()
+            alternateTurn()
+
+            gs <- gameState(board)
+            if gs <- x
+                print "X Won"
+                return 0
+
+            else if gs <- O
+                print "O Won"
+                return 0
+
+            else if gs <- 0
+                print "Draw"
+                return 0
+        return 0
+    }
+
+END
