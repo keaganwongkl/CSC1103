@@ -3,7 +3,7 @@ message1: .asciz "What is your value?: "    @message1 that wants to be printed o
 message2: .asciz "\nThe input value is: "   @message2 that wants to be printed out for user
 message3: .asciz "\nThe output value is: "  @message3 that wants to be printed out for user
 printline: .asciz "\n"                      @linefeed message that prints out
-inputformat: .asciz "%d"                    @used for scanf
+inputformat: .asciz "%d"                    @used for a formatted input for scanf to intake an integer value from user
 
 .balign 4                                   @requesting 4 bytes from memory
 var1:                                       @defining a variable of size 32 bits, since ARM is a 32bit system, var1 is stored at a specific memory location in RAM upon every code execution.
