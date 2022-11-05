@@ -1,365 +1,528 @@
-// C++ program to play Tic-Tac-Toe
-#include <bits/stdc++.h>
-using namespace std;
+//slightly dumber version level 1 difficulty 50% right move level 2 66% l3 75% etc
 
-// Length of the board
-#define SIDE 3
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <gtk/gtk.h>
 
-// Name of the players
-string PLAYER1, PLAYER2;
-char MODE;
+#define X -1 //defines X to allow change of turn
+#define O -2 //defines O to allow change of turn
 
-// Function to show the current
-// board status
-void showBoard(char board[][SIDE])
+#define CHAR_LIM 50 //max characters user can input
+    
+int turn = O; //sets your first turn to O
+
+int board[] = {1, 2, 3, 4, 5, 6, 7, 8, 9}; //shows the numbers on board placement
+
+int output = 0; //shows number of possible moves available
+
+void delay(int number_of_seconds)
 {
-	printf("\n\n");
-
-	printf("\t\t\t %c | %c | %c \n",
-		   board[0][0],
-		   board[0][1],
-		   board[0][2]); // Printing tictactoe board row by row
-
-	printf("\t\t\t------------\n");
-
-	printf("\t\t\t %c | %c | %c \n",
-		   board[1][0],
-		   board[1][1],
-		   board[1][2]);
-
-	printf("\t\t\t------------\n");
-	printf("\t\t\t %c | %c | %c \n\n",
-		   board[2][0],
-		   board[2][1],
-		   board[2][2]);
-
-	return;
+    // Converting time into milli_seconds
+    int milli_seconds = 1000 * number_of_seconds;
+ 
+    // Storing start time
+    clock_t start_time = clock();
+ 
+    // looping till required time is not achieved
+    while (clock() < start_time + milli_seconds)
+        ;
 }
 
-// Function to show the instructions
-void showInstructions()
-{
-	printf("\t\t\t Tic-Tac-Toe\n\n");
-
-	printf("Enter rows 1 to 3 and columns 1 to 3\n\n");
-
-	printf("\t\t\t    1   2   3 \n");
-	printf("\t\t\t 1    |   |   \n");
-	printf("\t\t\t   ------------\n");
-	printf("\t\t\t 2    |   |   \n");
-	printf("\t\t\t   ------------\n");
-	printf("\t\t\t 3    |   |   \n\n");
-
-	printf("-\t-\t-\t-\t-\t"
-		   "-\t-\t-\t-\t-\n\n");
-
-	return;
+void curBoard(int from[], int to[]){ //saves current board state
+    for(int i = 0; i < 9; i++){
+        to[i] = from[i];
+    }
 }
 
-// Function to initialise the game
-void initialise(char board[][SIDE],
-				int moves[])
-{
-	// Initiate the random number
-	// generator so that the same
-	// configuration doesn't arises
-	srand(time(NULL));
+//gets line WITHOUT \n 
+int getl(char s[], int lim){
+    int c, i;
 
-	// Initially the board is empty
-	// Building the board
-	for (int i = 0; i < SIDE; i++)
-	{
+    for(i = 0; i < lim-1 && (c = getchar()) != EOF && c != '\n'; i++)
+        s[i] = c;
+    
+    s[i] = '\0';
+    return i;
+}
+
+//converts char[] to int to allow for > and < operands to work
+int bufferToNum(char buffer[]){
+    int n = 0;
+    for(int i = 0; buffer[i] != '\0'; i++){
+        n = 10 * n + buffer[i] - '0';
+    }
+    return n;
+}
+
+//converts the board numbers to char to display
+char boardToChar(int i){
+    int a = board[i];
+    if (a == X){        
+        return 'X';
+    } else if (a == O){
+        return 'O';
+    } else {    
+       return a + '0';
+    }    
+}
+
+//prints board
+void printBoard() {
+  printf("=============\n"
+      "| %c | %c | %c |\n"
+      "-------------\n"
+      "| %c | %c | %c |\n"
+      "-------------\n"
+      "| %c | %c | %c |\n"
+      "=============\n", //
+      boardToChar(0), boardToChar(1), boardToChar(2),
+      boardToChar(3), boardToChar(4), boardToChar(5),
+      boardToChar(6), boardToChar(7), boardToChar(8));    
+}
+
+//alternates turn
+void altTurn(){
+    if (turn == O){
+        turn = X;    
+    } else if (turn == X){
+        turn = O;
+    }
+}
+
+//returns 1 if draw, return 0 if not a draw
+int draw(int l_board[]){
+    for(int i = 0; i < 9; i++){
+        if (l_board[i] == i+1){
+            return 0;
+        }
+    }
+    return 1;
+}
+
+//returns X if X won and O if O won and 0 if draw
+int win(int l_board[]){
+    //Rows
+    for (int i = 0; i < 3; i++){
+        if (l_board[3*i] == l_board[3*i + 1] && l_board[3*i + 1] == l_board[3*i + 2]){
+            return l_board[3*i];
+        }
+    }
+
+    //Columns
+    for (int j = 0; j < 3; j++){
+        if (l_board[j] == l_board[3 + j] && l_board[3 + j] == l_board[6 + j]){
+            return l_board[j];
+        }
+    }
+
+    //Diagonal Top Left to Bottom Right
+    if (l_board[0] == l_board[4] && l_board[0] == l_board[8]){
+        return l_board[0];
+    }
+
+    //Diagonal Top Right to bottom Left
+    if (l_board[2] == l_board[4] && l_board[2] == l_board[6]){
+        return l_board[2];
+    }
+
+    return 0;
+}
+
+//1 if no board placement and 0 if there is board placement 
+int putInBoard(int l_board[], int pos, int newVal){
+    if (l_board[pos] == pos+1){
+        l_board[pos] = newVal;
+        return 1;
+    } else
+    {
+        return 0;
+    }    
+}
+
+//X if X win, O if O win, 0 if draw, 1 if nothing
+int gameState(int l_board[]){
+    int wc = win(l_board);
+    if (wc == X){
+        return X;
+    } else if(wc == O){
+        return O;
+    } else {
+        if (draw(l_board)){
+            return 0;
+        }
+    }
+    return 1;
+}
+
+//shows allowed moves to be taken within the range of 1-9, array 0-8
+void legalMoves(int l_board[], int output[]){    
+    for(int i = 0; i < 9; i++){
+        if (l_board[i] == i+1){
+            output[i] = 1;
+        } else {
+            output[i] = 0;
+        }
+    }
+}
+
+//best possible move possible
+int max(int a, int b){
+    return a>b ? a : b;
+}
+
+//worst possible move possible
+int min(int a, int b){
+    return a<b ? a : b;
+}
+
+//X is computer
+int minimax(int l_board[], int depth, int maximising){
+    int gs = gameState(l_board); //goes through every single move possible from both sides
+    output++; //totals number of possible move that can be made
+    if (gs == X){ //best move that can be made
+        return 10;
+    } else if (gs == O){ //worst move that can be made
+        return -10;
+    } else if (gs == 0){ //no possible move
+        return 0;
+    }
+    if (depth == 0){ //no further board states available
+        return 0;
+    }
+    if (maximising){
+        //X's Turn so it has to maximise
+        int val = -100; //works together with gs to show how effective all moves will be
+        int legalMovesArr[9]; //prevents illegal moves <1 || >9
+        legalMoves(l_board, legalMovesArr); //finds the legal moves available with current boardstate
+        for (int i = 0; i < 9; i++){
+            if (legalMovesArr[i]){
+                int tempBoard[9];
+                curBoard(l_board, tempBoard);
+                putInBoard(tempBoard, i, X);
+                val = max(minimax(tempBoard, depth-1, 0), val);
+            }
+        }
+        return val;
+    } else {      
+        // for minimising to try to find the worst possible moves for opponent  
+        int val = 100;
+        int legalMovesArr[9];
+        legalMoves(l_board, legalMovesArr);
+        for (int i = 0; i < 9; i++){
+            if (legalMovesArr[i]){
+                int tempBoard[9];
+                curBoard(l_board, tempBoard);
+                putInBoard(tempBoard, i, O);
+                val = min(minimax(tempBoard, depth-1, 1), val);
+            }
+        }
+        return val;
+    }
+}
+
+int largemin(int l_board[], int depth, int maximising){
+    int gs = gameState(l_board); //goes through every single move possible from both sides
+    output++; //totals number of possible move that can be made
+    if (gs == O){ //best move that can be made
+        return 10;
+    } else if (gs == X){ //worst move that can be made
+        return -10;
+    } else if (gs == 0){ //no possible move
+        return 0;
+    }
+    if (depth == 0){ //no further board states available
+        return 0;
+    }
+    if (maximising){
+        //X's Turn so it has to maximise
+        int val = -100; //works together with gs to show how effective all moves will be
+        int legalMovesArr[9]; //prevents illegal moves <1 || >9
+        legalMoves(l_board, legalMovesArr); //finds the legal moves available with current boardstate
+        for (int i = 0; i < 9; i++){
+            if (legalMovesArr[i]){
+                int tempBoard[9];
+                curBoard(l_board, tempBoard);
+                putInBoard(tempBoard, i, X);
+                val = max(largemin(tempBoard, depth-1, 0), val);
+            }
+        }
+        return val;
+    } else {      
+        // for minimising to try to find the worst possible moves for opponent  
+        int val = 100;
+        int legalMovesArr[9];
+        legalMoves(l_board, legalMovesArr);
+        for (int i = 0; i < 9; i++){
+            if (legalMovesArr[i]){
+                int tempBoard[9];
+                curBoard(l_board, tempBoard);
+                putInBoard(tempBoard, i, O);
+                val = min(largemin(tempBoard, depth-1, 1), val);
+            }
+        }
+        return val;
+    }
+}
+
+
+
+int ai(int l_board[], int depth){ //uses current boardstate to find the best possible moves
+    int legalMovesArr[9];
+    legalMoves(board, legalMovesArr);
+    int val = -100;    
+    int best_move = 0;
+    for (int i = 0; i < 9; i++){
+        if (legalMovesArr[i]){
+            int tempBoard[9];
+            curBoard(l_board, tempBoard);
+            putInBoard(tempBoard, i, X);
+            int temp = minimax(tempBoard, depth-1, 0);
+            if (val <= temp){
+                val = temp;
+                best_move = i;
+            }            
+        }
+    }
+    return best_move; //the closer val is to 0, the better the move
+}
+
+int badai(int l_board[], int depth){ //uses current boardstate to find the best possible moves
+    int legalMovesArr[9];
+    legalMoves(board, legalMovesArr);
+    int val = -100;    
+    int worst_move = 0;
+    for (int i = 0; i < 9; i++){
+        if (legalMovesArr[i]){
+            int tempBoard[9];
+            curBoard(l_board, tempBoard);
+            putInBoard(tempBoard, i, X);
+            int temp = largemin(tempBoard, depth-1, 0);
+            if (val <= temp){
+                val = temp;
+                worst_move = i;
+            }            
+        }
+    }
+    return worst_move; //the closer val is to -10, the worst the move
+}
+
+
+int difficulty(){//asks user for difficulty level
+   char buffer[CHAR_LIM]; //allows for input limit of CHAR_LIM
+
+   printf("Please choose a difficulty from Level 1 to Level 5: ");
+   getl(buffer, CHAR_LIM); 
+   int n = bufferToNum(buffer);  
+   while(n <= 0 || n > 5){
+    printf("Please enter a value between 1 and 5: ");
+    getl(buffer, CHAR_LIM); 
+    n = bufferToNum(buffer);  
+   }
+   return(n);
+
+}
+
+GtkWidget *window;
+static void makeMovePressed(GtkButton *button, gpointer data) {
+	const char *text = gtk_button_get_label(button);
+	printf("%c \n", text);
+}
+
+void tictactoeWindow(){
+	GtkWidget *button;
+	GtkWidget *grid;
+	// Here we construct the container that is going pack our buttons 
+    grid = gtk_grid_new();
+
+    // Pack the container in the window 
+    gtk_window_set_child(GTK_WINDOW(window), grid);
+    
+	// Create Grid
+	for (int i = 0; i < 9; i++) {
+		char str[2];
+		str[0] = boardToChar(i);
+		str[1] = '\0';
+		button = gtk_button_new_with_label(str);
+		g_signal_connect(button, "clicked", G_CALLBACK(makeMovePressed), NULL);
+		// Place the first button in the grid cell (0, 0), and make it fill
+		// just 1 cell horizontally and vertically (ie no spanning)
+		int x = i % 3;
+		int y;
+		if (i < 9) y = 2;
+		if (i < 6) y = 1;
+		if (i < 3) y = 0;
+		
+		gtk_grid_attach(GTK_GRID(grid), button, x, y, 1, 1);
+	}
+    gtk_widget_show(window);
+}
+
+static void oneplayerpressed (GtkWidget *widget, gpointer data)
+{
+	tictactoeWindow();
+	
+    g_print ("Single player mode chosen\n");
+
+}
+
+
+static void twoplayerpressed (GtkWidget *widget, gpointer data)
+{
+    g_print ("Two player mode chosen\n");
+}
+
+
+static void htppressed (GtkWidget *widget, gpointer data)
+{
+    g_print ("world\n");
+}
+
+
+static void activate (GtkApplication* app, gpointer user_data)
+{
+	GtkWidget *grid;
+	GtkWidget *oneplayer;
+	GtkWidget *twoplayer;
+	GtkWidget *htp;
+
+	// new window with title//
+	window = gtk_application_window_new(app);
+	gtk_window_set_title(GTK_WINDOW(window), "Tic Tac Toe");
+	gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+	gtk_widget_show(window);
+
+	// construct the container that is going pack our buttons//
+	grid = gtk_grid_new();
+
+	// Pack the container in the window//
+	gtk_window_set_child(GTK_WINDOW(window), grid);
+
+	// oneplayer button//
+	/*gtk_grid_attach: horizontal,vertical,size_horizontal,size_vertical*/
+	oneplayer = gtk_button_new_with_label("player vs AI");
+	g_signal_connect(oneplayer, "clicked", G_CALLBACK(oneplayerpressed), NULL);
+	gtk_grid_attach(GTK_GRID(grid), oneplayer, 0, 0, 1, 1);
+
+	// twoplayer button//
+	/*gtk_grid_attach: horizontal,vertical,size_horizontal,size_vertical*/
+	twoplayer = gtk_button_new_with_label("player vs player");
+	g_signal_connect(twoplayer, "clicked", G_CALLBACK(twoplayerpressed), NULL);
+	gtk_grid_attach(GTK_GRID(grid), twoplayer, 0, 1, 1, 1);
+
+	// how to play button//
+	htp = gtk_button_new_with_label("how to play");
+	g_signal_connect(htp, "clicked", G_CALLBACK(htppressed), NULL);
+	gtk_grid_attach(GTK_GRID(grid), htp, 0, 2, 1, 1);
+}
+
+int main(int argc, char **argv){
+	
+	// UI elements for opening window
+	GtkApplication *app;
+	app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
+	g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+	g_application_run (G_APPLICATION (app), argc, argv);
+	g_object_unref (app);
+
+    printBoard(); //prints the board
+    int gameOn = 0; //ensures game is turned on
+    char buffer[CHAR_LIM]; //allows for input limit of CHAR_LIM
+    int hardness = difficulty()+1;
+    while(!gameOn){
+        if (turn == O){ //our turn
+            printf("%c's turn: ", turn == X ? 'X' : 'O'); //UI to show whos turn it currently is on
+            getl(buffer, CHAR_LIM); //user input between 1 and 9 for board placement;
+            int num = bufferToNum(buffer);        
+            while (num <= 0 || num > 9){ //checks for valid user input e.g non-number or out of range
+                printf("Please enter an integer between 1 and 9: ");
+                getl(buffer, CHAR_LIM);
+                num = bufferToNum(buffer);//converts char input to integer to allow for range validity           
+            }
+            if (putInBoard(board, num-1, turn)){ //boardspace is empty and can be placed
+                ;
+            } else {            
+                while(!putInBoard(board, num-1, turn)){ //prevents override of board placement
+                    printf("Something already exists, Please enter a new number: ");
+                    getl(buffer, CHAR_LIM);
+                    num = bufferToNum(buffer);
+                }
+            }
+        } else {
+            int random = rand()%hardness; //sets difficulty level by user input
+            //printf("1\n",hardness);
+            //printf("2\n",random);
+            printf("Computer is thinking...\n");
+            delay(3);
+
+
+            if(random !=1){ //makes all non-1 values be the smart move
+                //printf("3");
+                putInBoard(board,ai(board, 8), X);
+                printf("Calculated %d types of outputs\n", output);
+                output = 0;    
+            }
+            else{
+                putInBoard(board, badai(board, 8), X);
+            }    
+        }
+        
+        printBoard();                
+        altTurn();
+        int gs = gameState(board);
+        if (gs == X){
+            printf("X won!");
+            return 0;
+        } else if (gs == O){
+            printf("O won!");
+            return 0;
+        } else if (gs == 0){
+            printf("Draw!");
+            return 0;
+        }           
+    }
+    
+    return 0;
+}
+/*
+static void tictactoeWindow(GtkApplication *app, gpointer user_data)
+{
+    GtkWidget *tWindow;
+    GtkWidget *grid;
+    GtkWidget *button;
+
+    // create a new window, and set its title 
+    window = gtk_application_window_new(app);
+    gtk_window_set_title(GTK_WINDOW(tWindow), "Window");
+
+    // Here we construct the container that is going pack our buttons 
+    grid = gtk_grid_new();
+
+    // Pack the container in the window 
+    gtk_window_set_child(GTK_WINDOW(tWindow), grid);
+    
+    //int SIDE = 3;
+    char board[3][3];
+
+	for (int i = 0; i < SIDE; i++) {
 		for (int j = 0; j < SIDE; j++)
 			board[i][j] = ' ';
-	}
-
-	// Fill the moves with numbers
-	for (int i = 0; i < SIDE * SIDE; i++)
-		moves[i] = i;
-
-	// randomise the moves
-	random_shuffle(moves,
-				   moves + SIDE * SIDE);
-
-	return;
+    }
+    // Create Grid
+    for (int i = 0; i < SIDE; i++) {
+		for (int j = 0; j < SIDE; j++) {
+            char str[2];
+            str[0] = board[i][j];
+            str[1] = '\0';
+            button = gtk_button_new_with_label(str);  
+            g_signal_connect(button, "clicked", G_CALLBACK(print_hello), NULL);
+            // Place the first button in the grid cell (0, 0), and make it fill
+            // just 1 cell horizontally and vertically (ie no spanning)
+            
+            gtk_grid_attach(GTK_GRID(grid), button, i, j, 1, 1);
+        }
+    }
+    gtk_widget_show(tWindow);
 }
 
-// Function to declare winner of the game
-void declareWinner(string whoseTurn)
-{
-	if (whoseTurn == PLAYER1)
-		cout << PLAYER1 << " has won\n";
-	else
-		cout << PLAYER1 << " has won\n";
-	return;
-}
-
-// Function that returns true if
-// any of the row is crossed with
-// the same player's move
-bool rowCrossed(char board[][SIDE])
-{
-	for (int i = 0; i < SIDE; i++)
-	{
-		if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != ' ')
-			return (true);
-	}
-	return (false);
-}
-
-// Function that returns true if any
-// of the column is crossed with the
-// same player's move
-bool columnCrossed(char board[][SIDE])
-{
-	for (int i = 0; i < SIDE; i++)
-	{
-		if (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != ' ')
-			return (true);
-	}
-	return (false);
-}
-
-// Function that returns true if any
-// of the diagonal is crossed with
-// the same player's move
-bool diagonalCrossed(char board[][SIDE])
-{
-	if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != ' ')
-		return (true);
-
-	if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != ' ')
-		return (true);
-
-	return (false);
-}
-
-// Function that returns true if the
-// game is over else it returns a false
-bool gameOver(char board[][SIDE])
-{
-	return (rowCrossed(board) || columnCrossed(board) || diagonalCrossed(board));
-}
-
-// Function to play Tic-Tac-Toe
-void playTicTacToe(string whoseTurn)
-{
-	// A 3*3 Tic-Tac-Toe board for playing
-	char board[SIDE][SIDE];
-
-	int moves[SIDE * SIDE];
-
-	// Initialise the game
-	initialise(board, moves);
-
-	// Show instructions before playing
-	showInstructions();
-
-	int moveIndex = 0, x, y;
-	int r, c;
-
-	// Keep playing till the game is
-	// over or it is a draw
-	while (gameOver(board) == false && moveIndex != SIDE * SIDE)
-	{
-		if (whoseTurn == PLAYER1)
-		{
-
-		// Label for player1 wrong choice
-		// of row and column
-		player1:
-
-			// Input the desired row and
-			// column by player 1 to
-			// insert X
-			printf("Enter a row:");
-			scanf(" %d", &r);			
-			printf("Enter a column:");
-			scanf(" %d", &c);
-
-			if (r <= 3 && c <= 3)
-			{
-
-				// To check desired row and
-				// column should be empty
-				if (board[r - 1][c - 1] == ' ')
-					board[r - 1][c - 1] = 'X';
-
-				// If input is on already
-				// filled position
-				else
-				{
-					cout << "You cannot Overlap"
-						 << " on Already "
-							"filled position:\n";
-					goto player1;
-				}
-			}
-
-			// Input is not valid
-			else
-			{
-				cout << "\nInput is not "
-					 << "valid please enter "
-					 << "right one\n";
-
-				goto player1;
-			}
-
-			showBoard(board);
-			moveIndex++;
-			whoseTurn = PLAYER2;
-		}
-
-		else if (whoseTurn == PLAYER2 && MODE == '1')
-		{
-
-		// Label for player2 wrong choice
-		// of row and column
-		player2:
-
-			// Input the desired row and
-			// column by player 1 to
-			// insert X
-			printf("Enter a row:");
-			scanf(" %d", &r);			
-			printf("Enter a column:");
-			scanf(" %d", &c);
-
-			if (r <= 3 && c <= 3)
-			{
-
-				// Input the desired row and
-				// column by player 1 to
-				// insert X
-				if (board[r - 1][c - 1] == ' ')
-					board[r - 1][c - 1] = 'O';
-
-				// If input is on already
-				// filled position
-				else
-				{
-					cout << "You cannot Overlap"
-						 << " on Already "
-						 << "filled position:\n";
-					goto player2;
-				}
-			}
-
-			// Input is not valid
-			else
-			{
-				cout << "\nInput is not "
-					 << "valid please enter "
-					 << "right one :\n";
-				goto player2;
-			}
-
-			showBoard(board);
-			moveIndex++;
-			whoseTurn = PLAYER1;
-		}
-	
-		else if (whoseTurn == PLAYER2 && MODE == '0') // FOR COMPUTER INPUT
-		{
-
-		// Label for computer wrong choice
-		// of row and column
-		computer:
-
-			// The random postion plot by the computer
-			r = rand() % 3;
-			c = rand() % 3;
-
-				// Checks if position plot by computer is already taken
-				if (board[r][c] == ' ') {
-					board[r][c] = 'O';
-					cout << "\n The Computer has made its move, its now your turn";
-				}
-
-				// If input is on already
-				// filled position
-				else
-					goto computer;
-
-			showBoard(board);
-			moveIndex++;
-			whoseTurn = PLAYER1;
-		}
-	}
-
-	// If the game has drawn
-	if (gameOver(board) == false && moveIndex == SIDE * SIDE)
-		printf("It's a draw\n");
-	else
-	{
-
-		// Toggling the user to declare
-		// the actual winner
-		if (whoseTurn == PLAYER1)
-			whoseTurn = PLAYER2;
-		else if (whoseTurn == PLAYER2)
-			whoseTurn = PLAYER1;
-
-		// Declare the winner
-		declareWinner(whoseTurn);
-	}
-	return;
-}
-
-// Driver Code
-int main()
-{
-	// Select player mode
-	do
-	{
-		cout << "Play against a computer or player (Enter 0 for Computer, Enter 1 for player): ";
-		scanf("%c", &MODE);
-		//cin >> MODE;
-		// Play against a computer mode
-		if (MODE == '0')
-		{
-			PLAYER1 = "PLAYER 1";
-			PLAYER2 = "COMPUTER";
-		}
-
-		// Play against a player mode
-		else if (MODE == '1')
-		{
-			// Take the name of players
-			PLAYER1 = "PLAYER 1";
-			PLAYER2 = "PLAYER 2";
-		}
-		
-		else
-			continue;
-
-		// Use current time as seed for
-		// random generator
-		srand(time(0));
-
-		// Lets do toss
-		int toss = rand() % 2;
-
-		// Let us play the game
-		if (toss == 1)
-		{
-			cout << "Player "
-					<< PLAYER1
-					<< " win the toss"
-					<< endl;
-			playTicTacToe(PLAYER1);
-		}
-		else
-		{
-			cout << "Player "
-					<< PLAYER2
-					<< " win the toss"
-					<< endl;
-			playTicTacToe(PLAYER2);
-		}
-		return (0);
-	}
-
-	while (1); // CHECK IF THIS LOGIC WORKS ACCORDINGLY
-}
+*/
