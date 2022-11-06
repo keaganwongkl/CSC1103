@@ -1,3 +1,9 @@
+@Dallon Notes: This assembly code is for question 1 of assignment
+@Steps to run the program in Pi:
+    @to compile: as -o writingreadingram.o writingreadingram.s
+    @to build with link: gcc -o writingreadingram_asm writingreadingram.o
+    @to run: sudo ./writingreadingram_asm
+
 .data                                       @data segment to store strings and other variables
 message1: .asciz "What is your value?: "    @message1 that wants to be printed out for user
 message2: .asciz "\nThe input value is: "   @message2 that wants to be printed out for user
