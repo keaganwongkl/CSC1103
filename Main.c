@@ -325,8 +325,10 @@ int difficulty(){//asks user for difficulty level
 
 GtkWidget *window;
 static void makeMovePressed(GtkButton *button, gpointer data) {
-	const char *text = gtk_button_get_label(button);
-	printf("%c \n", text);
+	const gchar *text = gtk_button_get_label(button);
+	char label[10];
+	sprintf(label, "%8s\n", text); // Read the data properly pls
+	printf("%s \n", label);
 }
 
 void tictactoeWindow(){
