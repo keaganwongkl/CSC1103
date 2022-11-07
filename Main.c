@@ -16,6 +16,10 @@ int board[] = {1, 2, 3, 4, 5, 6, 7, 8, 9}; //shows the numbers on board placemen
 
 int output = 0; //shows number of possible moves available
 
+int difficulty; // 1 to 5 (only for PVE)
+
+int mode; // 1 for PVP 2 for PVE
+
 void delay(int number_of_seconds)
 {
     // Converting time into milli_seconds
@@ -307,7 +311,7 @@ int badai(int l_board[], int depth){ //uses current boardstate to find the best 
     return worst_move; //the closer val is to -10, the worst the move
 }
 
-
+/*
 int difficulty(){//asks user for difficulty level
    char buffer[CHAR_LIM]; //allows for input limit of CHAR_LIM
 
@@ -329,19 +333,77 @@ int player(){
     int n = bufferToNum(buffer);  
     return(n);
 
+}*/
+void tictactoeWindow();
+GtkWidget *window;
+
+// Function to open a dialog box with a message
+void quick_message(GtkWindow *parent, char *message)
+{
+    GtkWidget *dialog, *label, *content_area;
+    GtkDialogFlags flags;
+
+    // Create the widgets
+    flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+    dialog = gtk_dialog_new_with_buttons("Message",
+                                         parent,
+                                         flags,
+                                         
+                                         NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    label = gtk_label_new(message);
+
+    // Ensure that the dialog box is destroyed when the user responds
+
+    g_signal_connect_swapped(dialog,
+                             "response",
+                             G_CALLBACK(gtk_window_destroy),
+                             dialog);
+
+    // Add the label, and show everything we’ve added
+
+    gtk_box_append(GTK_BOX(content_area), label);
+    gtk_widget_show(dialog);
 }
 
-GtkWidget *window;
-static void makeMovePressed(GtkButton *button, gpointer data) {
-	const gchar *text = gtk_button_get_label(button);
-	char label[3];
-	sprintf(label, "%1s\n", text); // Read the data properly pls
-	printf("%c\n", label[0]);
+void gameLogic(int board[], int mode, int turn){
+    if (mode == 1) {
+        int gs = gameState(board);
+        if (gs == X){
+            tictactoeWindow();
+            printf("X won!");
+            quick_message(GTK_WINDOW(window), "X won!");
+        } else if (gs == O){
+            tictactoeWindow();
+            printf("O won!");
+            quick_message(GTK_WINDOW(window), "O won!");
+        } else if (gs == 0){
+            tictactoeWindow();
+            printf("Draw!");
+            quick_message(GTK_WINDOW(window), "Draw!");
+        } else {
+            altTurn();
+            tictactoeWindow();
+        }
+    } else {
+
+    }
 }
+
+static void boxOnClick(GtkButton *button, gpointer data) {
+	const gchar *text = gtk_button_get_label(button);
+    int num = bufferToNum(text);
+	printf("%d\n", num);
+    if(putInBoard(board, num-1, turn)) {
+        gameLogic(board, mode, turn);
+    }
+}
+
 
 void tictactoeWindow(){
 	GtkWidget *button;
 	GtkWidget *grid;
+    GtkWidget *label;
 	// Here we construct the container that is going pack our buttons 
     grid = gtk_grid_new();
 
@@ -349,12 +411,15 @@ void tictactoeWindow(){
     gtk_window_set_child(GTK_WINDOW(window), grid);
     
 	// Create Grid
+    
 	for (int i = 0; i < 9; i++) {
 		char str[2];
 		str[0] = boardToChar(i);
 		str[1] = '\0';
 		button = gtk_button_new_with_label(str);
-		g_signal_connect(button, "clicked", G_CALLBACK(makeMovePressed), NULL);
+        if (boardToChar(i) == 'X' || boardToChar(i) == 'O') 
+        gtk_widget_set_sensitive (button, FALSE);
+		g_signal_connect(button, "clicked", G_CALLBACK(boxOnClick), NULL);
 		// Place the first button in the grid cell (0, 0), and make it fill
 		// just 1 cell horizontally and vertically (ie no spanning)
 		int x = i % 3;
@@ -365,23 +430,33 @@ void tictactoeWindow(){
 		
 		gtk_grid_attach(GTK_GRID(grid), button, x, y, 1, 1);
 	}
+    char message[20];
+    sprintf(message, "Player %c's turn", turn == X ? 'X' : 'O');
+    //gchar *str;
+    label = gtk_label_new(NULL);
+    gtk_label_set_markup(GTK_LABEL(label), message);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, 3, 3, 1);
+
     gtk_widget_show(window);
 }
 
-void setDifficulty() {
-    tictactoeWindow();
+void difficultyOnClick(GtkButton *button, gpointer data) {
+    const gchar *text = gtk_button_get_label(button);
+    difficulty = bufferToNum(text);
+	printf("%d\n", difficulty);
+    //tictactoeWindow();
+    gameLogic(board, mode, turn);
 }
 
-void difficultySelect() {
+void difficultySelectWindow() {
     GtkWidget *button;
 	GtkWidget *grid;
-    GtkWidget * label;
+    GtkWidget *label;
 
     grid = gtk_grid_new();
     gtk_window_set_child(GTK_WINDOW(window), grid);
 
     gchar *str = "Choose a difficulty";
-
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), str);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 5, 1);
@@ -391,7 +466,7 @@ void difficultySelect() {
 		str[0] = i + '0';
 		str[1] = '\0';
 		button = gtk_button_new_with_label(str);
-        g_signal_connect(button, "clicked", G_CALLBACK(setDifficulty), NULL);
+        g_signal_connect(button, "clicked", G_CALLBACK(difficultyOnClick), NULL);
         gtk_grid_attach(GTK_GRID(grid), button, i-1, 1, 1, 1);
     }
 
@@ -401,23 +476,19 @@ void difficultySelect() {
 
 static void oneplayerpressed (GtkWidget *widget, gpointer data)
 {
-    difficultySelect();
+    mode = 2;
     g_print ("Single player mode chosen\n");
+    difficultySelectWindow();
 
 }
-
 
 static void twoplayerpressed (GtkWidget *widget, gpointer data)
 {
+    mode = 1;
     g_print ("Two player mode chosen\n");
+    gameLogic(board, mode, turn);
+    //tictactoeWindow();
 }
-
-
-static void htppressed (GtkWidget *widget, gpointer data)
-{
-    g_print ("world\n");
-}
-
 
 static void activate (GtkApplication* app, gpointer user_data)
 {
@@ -461,8 +532,8 @@ int main(int argc, char **argv){
 
 
 
-    int s = player();
-    if (s==1){
+    int s;// = player();
+    if (s==1){ // PVP
 //from here
     printBoard(); //prints the board
     int gameOn = 0; //ensures game is turned on
@@ -523,11 +594,11 @@ int main(int argc, char **argv){
     return 0;
 
 //to here
-    }else{
+    }else{ // PVE
     printBoard(); //prints the board
     int gameOn = 0; //ensures game is turned on
     char buffer[CHAR_LIM]; //allows for input limit of CHAR_LIM
-    int hardness = difficulty()+1;
+    int hardness;// = difficulty()+1;
     while(!gameOn){
         if (turn == O){ //our turn
             printf("%c's turn: ", turn == X ? 'X' : 'O'); //UI to show whos turn it currently is on
