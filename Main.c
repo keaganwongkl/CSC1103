@@ -334,9 +334,10 @@ int player(){
     return(n);
 
 }*/
-void tictactoeWindow();
+void tictactoeWindow(int board[], int turn, char state);
 GtkWidget *window;
 
+/*
 // Function to open a dialog box with a message
 void quick_message(GtkWindow *parent, char *message)
 {
@@ -345,10 +346,11 @@ void quick_message(GtkWindow *parent, char *message)
 
     // Create the widgets
     flags = GTK_DIALOG_DESTROY_WITH_PARENT;
-    dialog = gtk_dialog_new_with_buttons("Message",
+    dialog = gtk_dialog_new_with_buttons("Tic Tac Toe",
                                          parent,
                                          flags,
-                                         
+                                         "OK",
+                                         GTK_RESPONSE_NONE,
                                          NULL);
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     label = gtk_label_new(message);
@@ -364,43 +366,72 @@ void quick_message(GtkWindow *parent, char *message)
 
     gtk_box_append(GTK_BOX(content_area), label);
     gtk_widget_show(dialog);
-}
+}*/
 
-void gameLogic(int board[], int mode, int turn){
+void gameLogic(int board[], int mode){
     if (mode == 1) {
         int gs = gameState(board);
         if (gs == X){
-            tictactoeWindow();
+            tictactoeWindow(board, turn, 'X');
             printf("X won!");
-            quick_message(GTK_WINDOW(window), "X won!");
         } else if (gs == O){
-            tictactoeWindow();
+            tictactoeWindow(board, turn, 'O');
             printf("O won!");
-            quick_message(GTK_WINDOW(window), "O won!");
         } else if (gs == 0){
-            tictactoeWindow();
+            tictactoeWindow(board, turn, 'D');
             printf("Draw!");
-            quick_message(GTK_WINDOW(window), "Draw!");
         } else {
             altTurn();
-            tictactoeWindow();
+            tictactoeWindow(board, turn, ' ');
         }
     } else {
+        int gs = gameState(board);
+        if (gs == X){
+            tictactoeWindow(board, turn, 'X');
+            printf("X won!");
+        } else if (gs == O){
+            tictactoeWindow(board, turn, 'O');
+            printf("O won!");
+        } else if (gs == 0){
+            tictactoeWindow(board, turn, 'D');
+            printf("Draw!");
+        } else {
+            altTurn();
+            printf("%d's Turn\n", turn);
+            if (turn == X){
+                tictactoeWindow(board, turn, ' ');
+            } else {
+                int random = rand() % difficulty; // sets difficulty level by user input
+                // printf("1\n",hardness);
+                // printf("2\n",random);
+                printf("Computer is thinking...\n");
+                delay(1);
 
+                if (random != 1){ // makes all non-1 values be the smart move
+                    // printf("3");
+                    putInBoard(board, ai(board, 8), turn);
+                    printf("Calculated %d types of outputs\n", output);
+                    output = 0;
+                } else{
+                    putInBoard(board, badai(board, 8), turn);
+                }
+                gameLogic(board, mode);
+            }
+        }
     }
 }
 
 static void boxOnClick(GtkButton *button, gpointer data) {
 	const gchar *text = gtk_button_get_label(button);
     int num = bufferToNum(text);
-	printf("%d\n", num);
+	printf("Grid box: %d\n", num);
     if(putInBoard(board, num-1, turn)) {
-        gameLogic(board, mode, turn);
+        gameLogic(board, mode);
     }
 }
 
-
-void tictactoeWindow(){
+// board for displaying, turn for knowing which player is going next, state for determining winner (' ','X','O','D')
+void tictactoeWindow(int board[], int turn, char state){
 	GtkWidget *button;
 	GtkWidget *grid;
     GtkWidget *label;
@@ -417,8 +448,10 @@ void tictactoeWindow(){
 		str[0] = boardToChar(i);
 		str[1] = '\0';
 		button = gtk_button_new_with_label(str);
+        if (state != ' ')
+            gtk_widget_set_sensitive (button, FALSE);
         if (boardToChar(i) == 'X' || boardToChar(i) == 'O') 
-        gtk_widget_set_sensitive (button, FALSE);
+            gtk_widget_set_sensitive (button, FALSE);
 		g_signal_connect(button, "clicked", G_CALLBACK(boxOnClick), NULL);
 		// Place the first button in the grid cell (0, 0), and make it fill
 		// just 1 cell horizontally and vertically (ie no spanning)
@@ -431,7 +464,12 @@ void tictactoeWindow(){
 		gtk_grid_attach(GTK_GRID(grid), button, x, y, 1, 1);
 	}
     char message[20];
-    sprintf(message, "Player %c's turn", turn == X ? 'X' : 'O');
+    if (state == ' ')
+        sprintf(message, "Player %c's turn", turn == X ? 'X' : 'O');
+    else if (state == 'D')
+        sprintf(message, "It's a Draw!");
+    else
+        sprintf(message, "Player %c Won!", state);
     //gchar *str;
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), message);
@@ -442,10 +480,10 @@ void tictactoeWindow(){
 
 void difficultyOnClick(GtkButton *button, gpointer data) {
     const gchar *text = gtk_button_get_label(button);
-    difficulty = bufferToNum(text);
-	printf("%d\n", difficulty);
+    difficulty = bufferToNum(text) + 1;
+	printf("Difficulty: %d\n", difficulty);
     //tictactoeWindow();
-    gameLogic(board, mode, turn);
+    gameLogic(board, mode);
 }
 
 void difficultySelectWindow() {
@@ -486,7 +524,7 @@ static void twoplayerpressed (GtkWidget *widget, gpointer data)
 {
     mode = 1;
     g_print ("Two player mode chosen\n");
-    gameLogic(board, mode, turn);
+    gameLogic(board, mode);
     //tictactoeWindow();
 }
 
