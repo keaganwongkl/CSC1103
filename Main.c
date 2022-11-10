@@ -334,39 +334,9 @@ int player(){
     return(n);
 
 }*/
+static void mainWindow();
 void tictactoeWindow(int board[], int turn, char state);
 GtkWidget *window;
-
-/*
-// Function to open a dialog box with a message
-void quick_message(GtkWindow *parent, char *message)
-{
-    GtkWidget *dialog, *label, *content_area;
-    GtkDialogFlags flags;
-
-    // Create the widgets
-    flags = GTK_DIALOG_DESTROY_WITH_PARENT;
-    dialog = gtk_dialog_new_with_buttons("Tic Tac Toe",
-                                         parent,
-                                         flags,
-                                         "OK",
-                                         GTK_RESPONSE_NONE,
-                                         NULL);
-    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    label = gtk_label_new(message);
-
-    // Ensure that the dialog box is destroyed when the user responds
-
-    g_signal_connect_swapped(dialog,
-                             "response",
-                             G_CALLBACK(gtk_window_destroy),
-                             dialog);
-
-    // Add the label, and show everything we’ve added
-
-    gtk_box_append(GTK_BOX(content_area), label);
-    gtk_widget_show(dialog);
-}*/
 
 void gameLogic(int board[], int mode){
     if (mode == 1) {
@@ -430,6 +400,15 @@ static void boxOnClick(GtkButton *button, gpointer data) {
     }
 }
 
+static void returnOnClick(GtkButton *button, gpointer data) {
+    turn = O;
+	for (int i = 1; i <= 9; i ++) {
+        board[i] = i;
+        printf("%d \n", i);
+    }
+    mainWindow();
+}
+
 // board for displaying, turn for knowing which player is going next, state for determining winner (' ','X','O','D')
 void tictactoeWindow(int board[], int turn, char state){
 	GtkWidget *button;
@@ -466,10 +445,15 @@ void tictactoeWindow(int board[], int turn, char state){
     char message[20];
     if (state == ' ')
         sprintf(message, "Player %c's turn", turn == X ? 'X' : 'O');
-    else if (state == 'D')
-        sprintf(message, "It's a Draw!");
-    else
-        sprintf(message, "Player %c Won!", state);
+    else {
+        if (state == 'D')
+            sprintf(message, "It's a Draw!");
+        else
+            sprintf(message, "Player %c Won!", state);
+        button = gtk_button_new_with_label("Return");
+        g_signal_connect(button, "clicked", G_CALLBACK(returnOnClick), NULL);
+        gtk_grid_attach(GTK_GRID(grid), button, 0, 4, 3, 1);
+        }
     //gchar *str;
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), message);
@@ -525,21 +509,12 @@ static void twoplayerpressed (GtkWidget *widget, gpointer data)
     mode = 1;
     g_print ("Two player mode chosen\n");
     gameLogic(board, mode);
-    //tictactoeWindow();
 }
 
-static void activate (GtkApplication* app, gpointer user_data)
-{
-	GtkWidget *grid;
+static void mainWindow() {
+    GtkWidget *grid;
 	GtkWidget *oneplayer;
 	GtkWidget *twoplayer;
-
-	// new window with title//
-	window = gtk_application_window_new(app);
-	gtk_window_set_title(GTK_WINDOW(window), "Tic Tac Toe");
-	//gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
-	gtk_widget_show(window);
-
 	// construct the container that is going pack our buttons//
 	grid = gtk_grid_new();
 
@@ -559,10 +534,21 @@ static void activate (GtkApplication* app, gpointer user_data)
 	gtk_grid_attach(GTK_GRID(grid), twoplayer, 0, 1, 1, 1);
 }
 
+static void activate (GtkApplication* app, gpointer user_data)
+{
+	// new window with title//
+	window = gtk_application_window_new(app);
+	gtk_window_set_title(GTK_WINDOW(window), "Tic Tac Toe");
+	//gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+	gtk_widget_show(window);
+    mainWindow();
+}
+
 
 int main(int argc, char **argv){
-    	// UI elements for opening window
-	GtkApplication *app;
+    // UI elements for opening window
+    GtkApplication *app;
+
 	app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
 	g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
 	g_application_run (G_APPLICATION (app), argc, argv);
