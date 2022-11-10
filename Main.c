@@ -10,7 +10,7 @@
 
 #define CHAR_LIM 50 //max characters user can input
     
-int turn = O; //sets your first turn to O
+int turn = X; //sets your first turn to O
 
 int board[] = {1, 2, 3, 4, 5, 6, 7, 8, 9}; //shows the numbers on board placement
 
@@ -343,13 +343,13 @@ void gameLogic(int board[], int mode){
         int gs = gameState(board);
         if (gs == X){
             tictactoeWindow(board, turn, 'X');
-            printf("X won!");
+            printf("X won! \n");
         } else if (gs == O){
             tictactoeWindow(board, turn, 'O');
-            printf("O won!");
+            printf("O won! \n");
         } else if (gs == 0){
             tictactoeWindow(board, turn, 'D');
-            printf("Draw!");
+            printf("Draw! \n");
         } else {
             altTurn();
             tictactoeWindow(board, turn, ' ');
@@ -358,20 +358,21 @@ void gameLogic(int board[], int mode){
         int gs = gameState(board);
         if (gs == X){
             tictactoeWindow(board, turn, 'X');
-            printf("X won!");
+            printf("X won! \n");
         } else if (gs == O){
             tictactoeWindow(board, turn, 'O');
-            printf("O won!");
+            printf("O won! \n");
         } else if (gs == 0){
             tictactoeWindow(board, turn, 'D');
-            printf("Draw!");
+            printf("Draw! \n");
         } else {
             altTurn();
             printf("%d's Turn\n", turn);
-            if (turn == X){
+            if (turn == O){
                 tictactoeWindow(board, turn, ' ');
             } else {
                 int random = rand() % difficulty; // sets difficulty level by user input
+                printf("random = %d \n", random);
                 // printf("1\n",hardness);
                 // printf("2\n",random);
                 printf("Computer is thinking...\n");
@@ -379,11 +380,11 @@ void gameLogic(int board[], int mode){
 
                 if (random != 1){ // makes all non-1 values be the smart move
                     // printf("3");
-                    putInBoard(board, ai(board, 8), turn);
+                    putInBoard(board, ai(board, 8), X);
                     printf("Calculated %d types of outputs\n", output);
                     output = 0;
                 } else{
-                    putInBoard(board, badai(board, 8), turn);
+                    putInBoard(board, badai(board, 8), X);
                 }
                 gameLogic(board, mode);
             }
@@ -401,10 +402,9 @@ static void boxOnClick(GtkButton *button, gpointer data) {
 }
 
 static void returnOnClick(GtkButton *button, gpointer data) {
-    turn = O;
+    turn = X;
 	for (int i = 1; i <= 9; i ++) {
-        board[i] = i;
-        printf("%d \n", i);
+        board[i-1] = i;
     }
     mainWindow();
 }
