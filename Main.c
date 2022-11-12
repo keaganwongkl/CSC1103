@@ -400,10 +400,10 @@ void gameLogic(int board[], int mode){
 
 // Event listener for tictactoe box click 
 void boxOnClick(GtkButton *button, gpointer data) {
-    const gchar *text = gtk_widget_get_name(button);
+    gchar *text = gtk_widget_get_name(button); // Recieves the name of the box
     int num = bufferToNum(text);
 	printf("Grid box: %d\n", num);
-    if(putInBoard(board, num-1, turn)) {
+    if(putInBoard(board, num-1, turn)) { // Ensures that the move is valid and is made
         gameLogic(board, mode);
     }
 }
@@ -424,33 +424,34 @@ void returnOnClick(GtkButton *button, gpointer data) {
 
 // Function for displaying the tic-tac-toe box
 // Called from gameLogic() after a move is made
-void tictactoeWindow(int board[], int turn, char state) { // state for determining winner (' ','X','O','D')
-
+void tictactoeWindow(int board[], int turn, char state) { // state is for determining winner (' ','X','O','D')
+    // Declaring widgets within the window
 	GtkWidget *button;
 	GtkWidget *grid;
     GtkWidget *label;
 
+    // Creating the grid, setting it as the widget in the window
     grid = gtk_grid_new();
-
     gtk_window_set_child(GTK_WINDOW(window), grid);
-    gtk_widget_set_halign (grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_halign (grid, GTK_ALIGN_CENTER); // Alligning the grid in the window
     
+    // Creating the individual tiactactoe boxes within the grid
+    // Using buttons to represent each box of the grid
 	for (int i = 0; i < 9; i++) {
-		char str[2];
-		str[0] = boardToChar(i);
-		str[1] = '\0';
-		button = gtk_button_new_with_label(str);
-        gtk_widget_set_name (button, str);
+        char str[2] = {boardToChar(i)};
 
-
+        // if the board number i is 'X' or 'O' display as such
         if (boardToChar(i) == 'X' || boardToChar(i) == 'O'){
-            button = gtk_button_new_with_label(str);
-            gtk_widget_set_name (button, str);
-            gtk_widget_set_sensitive (button, FALSE);
-        } else {
-            button = gtk_button_new_with_label(" ");
-            gtk_widget_set_name (button, str);
-            gtk_widget_set_sensitive (button, TRUE);
+            button = gtk_button_new_with_label(str); // Sets the button text as 'X' or 'O'
+            gtk_widget_set_name (button, str); // Assigns the name of the button
+            gtk_widget_set_sensitive (button, FALSE); // Disables the button
+        } 
+        
+        // else the box is set as blank
+        else {
+            button = gtk_button_new_with_label(" "); // Sets the button text as ' '
+            gtk_widget_set_name (button, str); // Assigns the name of the button
+            gtk_widget_set_sensitive (button, TRUE); // Enables the button
         }
 
         // Assigns the event listener to the button
@@ -466,25 +467,29 @@ void tictactoeWindow(int board[], int turn, char state) { // state for determini
 		if (i < 9) y = 2;
 		if (i < 6) y = 1;
 		if (i < 3) y = 0;
+
+        // Attaching the button to the grid
 		gtk_grid_attach(GTK_GRID(grid), button, x, y, 1, 1); // Attaching the button
 	}
 
-
+    // Sets the message to display at the bottom of the grid
     char message[20];
-    if (state == ' ')
-        sprintf(message, "Player %c's turn", turn == X ? 'X' : 'O');
+    if (state == ' ') // Checks if the current game is still ongoing
+        sprintf(message, "Player %c's turn", turn == X ? 'X' : 'O'); // Sets the message as the current player's turn
     else {
-        if (state == 'D')
-            sprintf(message, "It's a Draw!");
+        if (state == 'D') // checks if the game resulted in a draw
+            sprintf(message, "It's a Draw!"); // Sets the message as a draw
         else
-            sprintf(message, "Player %c Won!", state);
+            sprintf(message, "Player %c Won!", state); // Sets the message as a win
+
+        // Shows the "Return" button below the message
         button = gtk_button_new_with_label("Return");
         g_signal_connect(button, "clicked", G_CALLBACK(returnOnClick), NULL);
         gtk_grid_attach(GTK_GRID(grid), button, 0, 4, 3, 1);
         }
-    //gchar *str;
-    label = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(label), message);
+
+    // Displays the message at the bottom of the grid
+    label = gtk_label_new(message);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 3, 3, 1);
 
     gtk_widget_show(window);
@@ -493,34 +498,36 @@ void tictactoeWindow(int board[], int turn, char state) { // state for determini
 // Event listener for difficulty select buttons
 // Triggered from difficultySelectWindow() when the user clicks on a difficulty option
 void difficultyOnClick(GtkButton *button, gpointer data) {
-    const gchar *text = gtk_button_get_label(button);
-    difficulty = bufferToNum(text) + 1;
+    // Recieves the name of the button
+    gchar *text = gtk_button_get_label(button);
+    difficulty = bufferToNum(text) + 1; // Sets the difficulty level +1 based on the button clicked
 	printf("Difficulty: %d\n", difficulty);
-    gameLogic(board, mode);
+    gameLogic(board, mode); // Starts the game
 }
 
 // Function for displaying the difficulty select screen when the user chooses "Player vs AI"
 void difficultySelectWindow() {
+    // Declaring widgets within the window
     GtkWidget *button;
 	GtkWidget *grid;
     GtkWidget *label;
 
+    // Creating the grid, setting it as the widget in the window
     grid = gtk_grid_new();
     gtk_window_set_child(GTK_WINDOW(window), grid);
     gtk_widget_set_halign (grid, GTK_ALIGN_CENTER);
 
-    gchar *str = "Choose a difficulty";
-    label = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(label), str);
-    gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 5, 1);
+    // Setting a label to instruct the user to select a difficulty
+    label = gtk_label_new("Choose a difficulty");
+    gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 5, 1); // Attaching the label to the top of the grid and span 5 columns
     
+    // Creating the difficulty select buttons within the grid
     for (int i = 1; i < 6; i++) {
         char str[2];
-		str[0] = i + '0';
-		str[1] = '\0';
-		button = gtk_button_new_with_label(str);
-        g_signal_connect(button, "clicked", G_CALLBACK(difficultyOnClick), NULL);
-        gtk_grid_attach(GTK_GRID(grid), button, i-1, 1, 1, 1);
+        sprintf(str, "%d", i);
+		button = gtk_button_new_with_label(str); // Sets the button text as the difficulty level
+        g_signal_connect(button, "clicked", G_CALLBACK(difficultyOnClick), NULL); // Assigns the event listener to the button
+        gtk_grid_attach(GTK_GRID(grid), button, i-1, 1, 1, 1); // Attaching the button to the grid
     }
 
     gtk_widget_show(window);
