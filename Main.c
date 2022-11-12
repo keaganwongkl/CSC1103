@@ -340,40 +340,43 @@ int badai(int l_board[], int depth){ //uses current boardstate to find the best 
     return worst_move; //the closer val is to -10, the worst the move
 }
 
-
+// Function for checking for a winner, switching player turns and running the AI
+// Called after each player/AI move and at the start of a game
 void gameLogic(int board[], int mode){
-    if (mode == 1) {
-        int gs = gameState(board);
-        if (gs == X){
-            tictactoeWindow(board, turn, 'X');
-            printf("X won! \n");
-        } else if (gs == O){
-            tictactoeWindow(board, turn, 'O');
-            printf("O won! \n");
-        } else if (gs == 0){
-            tictactoeWindow(board, turn, 'D');
-            printf("Draw! \n");
-        } else {
-            altTurn();
-            tictactoeWindow(board, turn, ' ');
-        }
-    } else {
-        int gs = gameState(board);
-        if (gs == X){
-            tictactoeWindow(board, turn, 'X');
-            printf("X won! \n");
-        } else if (gs == O){
-            tictactoeWindow(board, turn, 'O');
-            printf("O won! \n");
-        } else if (gs == 0){
-            tictactoeWindow(board, turn, 'D');
-            printf("Draw! \n");
-        } else {
-            altTurn();
+    // Checking if a winner
+    int gs = gameState(board);
+
+    // if there is a winner tictactoeWindow() is called
+    if (gs == X){
+        tictactoeWindow(board, turn, 'X'); // X is the winner
+        printf("X won! \n");
+    } else if (gs == O){
+        tictactoeWindow(board, turn, 'O'); // O is the winner
+        printf("O won! \n");
+    } else if (gs == 0){
+        tictactoeWindow(board, turn, 'D'); // It is a draw
+    } 
+
+    // There is no winner therefore the game continues
+    else{
+        // if Player vs Player 
+        if (mode == 1) {
+            altTurn(); // Switch player turns
+            tictactoeWindow(board, turn, ' '); // Display the board
+        } 
+        
+        // else Player vs AI
+        else { 
+            altTurn(); // Switch player turns
             printf("%d's Turn\n", turn);
+
+            // if the current player is the user
             if (turn == O){
                 tictactoeWindow(board, turn, ' ');
-            } else {
+            }
+
+            // else the current player is the AI 
+            else {
                 int random = rand() % difficulty; // sets difficulty level by user input
                 printf("random = %d \n", random);
                 // printf("1\n",hardness);
@@ -381,7 +384,7 @@ void gameLogic(int board[], int mode){
                 printf("Computer is thinking...\n");
                 delay(1);
 
-                if (random != 1){ // makes all non-1 values be the smart move
+                if (random != 1){ // makes all non 1 values be the smart move
                     // printf("3");
                     putInBoard(board, ai(board, 8), X);
                     printf("Calculated %d types of outputs\n", output);
@@ -389,15 +392,15 @@ void gameLogic(int board[], int mode){
                 } else{
                     putInBoard(board, badai(board, 8), X);
                 }
-                gameLogic(board, mode);
+                gameLogic(board, mode); // re-runs gameLogic as AI has made its move
             }
         }
     }
 }
 
+// Event listener for tictactoe box click 
 void boxOnClick(GtkButton *button, gpointer data) {
     const gchar *text = gtk_widget_get_name(button);
-	//const gchar *text = gtk_button_get_label(button);
     int num = bufferToNum(text);
 	printf("Grid box: %d\n", num);
     if(putInBoard(board, num-1, turn)) {
@@ -405,27 +408,32 @@ void boxOnClick(GtkButton *button, gpointer data) {
     }
 }
 
+// Event listener for "Return" button
+// Triggered from tictactoeWindow() when the user clicks "Retun" after game ends
 void returnOnClick(GtkButton *button, gpointer data) {
-    turn = X;
+    // Resets the starting player turn to default
+    turn = X; 
+
+    // Clears the board
 	for (int i = 1; i <= 9; i ++) {
         board[i-1] = i;
     }
-    mainWindow();
+    // Returns the player back to the menu screen
+    mainWindow(); 
 }
 
-// 
+// Function for displaying the tic-tac-toe box
+// Called from gameLogic() after a move is made
 void tictactoeWindow(int board[], int turn, char state) { // state for determining winner (' ','X','O','D')
+
 	GtkWidget *button;
 	GtkWidget *grid;
     GtkWidget *label;
-	// Here we construct the container that is going pack our buttons 
+
     grid = gtk_grid_new();
 
-    // Pack the container in the window 
     gtk_window_set_child(GTK_WINDOW(window), grid);
     gtk_widget_set_halign (grid, GTK_ALIGN_CENTER);
-    
-	// Create Grid
     
 	for (int i = 0; i < 9; i++) {
 		char str[2];
@@ -482,14 +490,16 @@ void tictactoeWindow(int board[], int turn, char state) { // state for determini
     gtk_widget_show(window);
 }
 
+// Event listener for difficulty select buttons
+// Triggered from difficultySelectWindow() when the user clicks on a difficulty option
 void difficultyOnClick(GtkButton *button, gpointer data) {
     const gchar *text = gtk_button_get_label(button);
     difficulty = bufferToNum(text) + 1;
 	printf("Difficulty: %d\n", difficulty);
-    //tictactoeWindow();
     gameLogic(board, mode);
 }
 
+// Function for displaying the difficulty select screen when the user chooses "Player vs AI"
 void difficultySelectWindow() {
     GtkWidget *button;
 	GtkWidget *grid;
@@ -545,13 +555,13 @@ void mainWindow() {
 
 	// oneplayer button//
 	/*gtk_grid_attach: horizontal,vertical,size_horizontal,size_vertical*/
-	oneplayer = gtk_button_new_with_label("player vs AI");
+	oneplayer = gtk_button_new_with_label("Player vs AI");
 	g_signal_connect(oneplayer, "clicked", G_CALLBACK(oneplayerpressed), NULL);
 	gtk_grid_attach(GTK_GRID(grid), oneplayer, 0, 0, 1, 1);
 
 	// twoplayer button//
 	/*gtk_grid_attach: horizontal,vertical,size_horizontal,size_vertical*/
-	twoplayer = gtk_button_new_with_label("player vs player");
+	twoplayer = gtk_button_new_with_label("Player vs Player");
 	g_signal_connect(twoplayer, "clicked", G_CALLBACK(twoplayerpressed), NULL);
 	gtk_grid_attach(GTK_GRID(grid), twoplayer, 0, 1, 1, 1);
 }
@@ -570,7 +580,7 @@ int main(int argc, char **argv){
     // UI elements for opening window
     GtkApplication *app;
     int status;
-	app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
+	app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
 	g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 	g_object_unref (app);
