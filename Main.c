@@ -1,4 +1,4 @@
-//slightly dumber version level 1 difficulty 50% right move level 2 66% l3 75% etc
+// To compile, run gcc $(pkg-config --cflags gtk4) -o main main.c $(pkg-config --libs gtk4)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +19,37 @@ int output = 0; //shows number of possible moves available
 int difficulty; // 1 to 5 (only for PVE)
 
 int mode; // 1 for PVP 2 for PVE
+
+GtkWidget *window; // Main window used for UI
+
+void delay(int number_of_seconds);
+void curBoard(int from[], int to[]);
+int getl(char s[], int lim);
+int bufferToNum(char buffer[]);
+char boardToChar(int i);
+void printBoard();
+void altTurn();
+int draw(int l_board[]);
+int win(int l_board[]);
+int putInBoard(int l_board[], int pos, int newVal);
+int gameState(int l_board[]);
+void legalMoves(int l_board[], int output[]);
+int max(int a, int b);
+int min(int a, int b);
+int minimax(int l_board[], int depth, int maximising);
+int largemin(int l_board[], int depth, int maximising);
+int ai(int l_board[], int depth);
+int badai(int l_board[], int depth);
+void gameLogic(int board[], int mode);
+void returnOnClick(GtkButton *button, gpointer data);
+void tictactoeWindow(int board[], int turn, char state);
+void difficultyOnClick(GtkButton *button, gpointer data);
+void difficultySelectWindow();
+void oneplayerpressed (GtkWidget *widget, gpointer data);
+void twoplayerpressed (GtkWidget *widget, gpointer data);
+void mainWindow();
+static void activate (GtkApplication* app, gpointer user_data);
+int main(int argc, char **argv);
 
 void delay(int number_of_seconds)
 {
@@ -269,8 +300,6 @@ int largemin(int l_board[], int depth, int maximising){
     }
 }
 
-
-
 int ai(int l_board[], int depth){ //uses current boardstate to find the best possible moves
     int legalMovesArr[9];
     legalMoves(board, legalMovesArr);
@@ -311,32 +340,6 @@ int badai(int l_board[], int depth){ //uses current boardstate to find the best 
     return worst_move; //the closer val is to -10, the worst the move
 }
 
-/*
-int difficulty(){//asks user for difficulty level
-   char buffer[CHAR_LIM]; //allows for input limit of CHAR_LIM
-
-   printf("Please choose a difficulty from Level 1 to Level 5: ");
-   getl(buffer, CHAR_LIM); 
-   int n = bufferToNum(buffer);  
-   while(n <= 0 || n > 5){
-    printf("Please enter a value between 1 and 5: ");
-    getl(buffer, CHAR_LIM); 
-    n = bufferToNum(buffer);  
-   }
-   return(n);
-
-}
-int player(){   
-    char buffer[CHAR_LIM]; //allows for input limit of CHAR_LIM
-    printf("Enter 1 for PVP, 2 for PVE ");
-    getl(buffer, CHAR_LIM); 
-    int n = bufferToNum(buffer);  
-    return(n);
-
-}*/
-static void mainWindow();
-void tictactoeWindow(int board[], int turn, char state);
-GtkWidget *window;
 
 void gameLogic(int board[], int mode){
     if (mode == 1) {
@@ -392,8 +395,9 @@ void gameLogic(int board[], int mode){
     }
 }
 
-static void boxOnClick(GtkButton *button, gpointer data) {
-	const gchar *text = gtk_button_get_label(button);
+void boxOnClick(GtkButton *button, gpointer data) {
+    const gchar *text = gtk_widget_get_name(button);
+	//const gchar *text = gtk_button_get_label(button);
     int num = bufferToNum(text);
 	printf("Grid box: %d\n", num);
     if(putInBoard(board, num-1, turn)) {
@@ -401,7 +405,7 @@ static void boxOnClick(GtkButton *button, gpointer data) {
     }
 }
 
-static void returnOnClick(GtkButton *button, gpointer data) {
+void returnOnClick(GtkButton *button, gpointer data) {
     turn = X;
 	for (int i = 1; i <= 9; i ++) {
         board[i-1] = i;
@@ -409,8 +413,8 @@ static void returnOnClick(GtkButton *button, gpointer data) {
     mainWindow();
 }
 
-// board for displaying, turn for knowing which player is going next, state for determining winner (' ','X','O','D')
-void tictactoeWindow(int board[], int turn, char state){
+// 
+void tictactoeWindow(int board[], int turn, char state) { // state for determining winner (' ','X','O','D')
 	GtkWidget *button;
 	GtkWidget *grid;
     GtkWidget *label;
@@ -419,6 +423,7 @@ void tictactoeWindow(int board[], int turn, char state){
 
     // Pack the container in the window 
     gtk_window_set_child(GTK_WINDOW(window), grid);
+    gtk_widget_set_halign (grid, GTK_ALIGN_CENTER);
     
 	// Create Grid
     
@@ -427,21 +432,36 @@ void tictactoeWindow(int board[], int turn, char state){
 		str[0] = boardToChar(i);
 		str[1] = '\0';
 		button = gtk_button_new_with_label(str);
-        if (state != ' ')
+        gtk_widget_set_name (button, str);
+
+
+        if (boardToChar(i) == 'X' || boardToChar(i) == 'O'){
+            button = gtk_button_new_with_label(str);
+            gtk_widget_set_name (button, str);
             gtk_widget_set_sensitive (button, FALSE);
-        if (boardToChar(i) == 'X' || boardToChar(i) == 'O') 
-            gtk_widget_set_sensitive (button, FALSE);
+        } else {
+            button = gtk_button_new_with_label(" ");
+            gtk_widget_set_name (button, str);
+            gtk_widget_set_sensitive (button, TRUE);
+        }
+
+        // Assigns the event listener to the button
 		g_signal_connect(button, "clicked", G_CALLBACK(boxOnClick), NULL);
-		// Place the first button in the grid cell (0, 0), and make it fill
-		// just 1 cell horizontally and vertically (ie no spanning)
-		int x = i % 3;
-		int y;
+
+        // Disables the buttons if the game is over
+        if (state != ' ') // Checks if the current game is over
+            gtk_widget_set_sensitive (button, FALSE); // Disables the button
+
+        // Calculating the button position and then attaching it to the grid
+        int x = i % 3; // Determins the x axis
+		int y; // Determining the y axis
 		if (i < 9) y = 2;
 		if (i < 6) y = 1;
 		if (i < 3) y = 0;
-		
-		gtk_grid_attach(GTK_GRID(grid), button, x, y, 1, 1);
+		gtk_grid_attach(GTK_GRID(grid), button, x, y, 1, 1); // Attaching the button
 	}
+
+
     char message[20];
     if (state == ' ')
         sprintf(message, "Player %c's turn", turn == X ? 'X' : 'O');
@@ -477,6 +497,7 @@ void difficultySelectWindow() {
 
     grid = gtk_grid_new();
     gtk_window_set_child(GTK_WINDOW(window), grid);
+    gtk_widget_set_halign (grid, GTK_ALIGN_CENTER);
 
     gchar *str = "Choose a difficulty";
     label = gtk_label_new(NULL);
@@ -496,7 +517,7 @@ void difficultySelectWindow() {
 
 }
 
-static void oneplayerpressed (GtkWidget *widget, gpointer data)
+void oneplayerpressed (GtkWidget *widget, gpointer data)
 {
     mode = 2;
     g_print ("Single player mode chosen\n");
@@ -504,14 +525,14 @@ static void oneplayerpressed (GtkWidget *widget, gpointer data)
 
 }
 
-static void twoplayerpressed (GtkWidget *widget, gpointer data)
+void twoplayerpressed (GtkWidget *widget, gpointer data)
 {
     mode = 1;
     g_print ("Two player mode chosen\n");
     gameLogic(board, mode);
 }
 
-static void mainWindow() {
+void mainWindow() {
     GtkWidget *grid;
 	GtkWidget *oneplayer;
 	GtkWidget *twoplayer;
@@ -520,6 +541,7 @@ static void mainWindow() {
 
 	// Pack the container in the window//
 	gtk_window_set_child(GTK_WINDOW(window), grid);
+    gtk_widget_set_halign (grid, GTK_ALIGN_CENTER);
 
 	// oneplayer button//
 	/*gtk_grid_attach: horizontal,vertical,size_horizontal,size_vertical*/
@@ -539,143 +561,18 @@ static void activate (GtkApplication* app, gpointer user_data)
 	// new window with title//
 	window = gtk_application_window_new(app);
 	gtk_window_set_title(GTK_WINDOW(window), "Tic Tac Toe");
-	//gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+	gtk_window_set_default_size(GTK_WINDOW(window), 300, 150);
 	gtk_widget_show(window);
     mainWindow();
 }
 
-
 int main(int argc, char **argv){
     // UI elements for opening window
     GtkApplication *app;
-
+    int status;
 	app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
 	g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
-	g_application_run (G_APPLICATION (app), argc, argv);
+	status = g_application_run (G_APPLICATION (app), argc, argv);
 	g_object_unref (app);
-
-
-
-    int s;// = player();
-    if (s==1){ // PVP
-//from here
-    printBoard(); //prints the board
-    int gameOn = 0; //ensures game is turned on
-    char buffer[CHAR_LIM]; //allows for input limit of CHAR_LIM
-    while(!gameOn){
-        if (turn == O){ //our turn
-        printf("O's turn: "); //UI to show whos turn it currently is on
-        getl(buffer, CHAR_LIM); //user input between 1 and 9 for board placement;
-        int num = bufferToNum(buffer);        
-        while (num <= 0 || num > 9){ //checks for valid user input e.g non-number or out of range
-            printf("Please enter an integer between 1 and 9: ");
-            getl(buffer, CHAR_LIM);
-            num = bufferToNum(buffer);//converts char input to integer to allow for range validity           
-            }
-            if (putInBoard(board, num-1, turn)){ //boardspace is empty and can be placed
-                ;
-            } else {            
-                while(!putInBoard(board, num-1, turn)){ //prevents override of board placement
-                    printf("Something already exists, Please enter a new number: ");
-                    getl(buffer, CHAR_LIM);
-                    num = bufferToNum(buffer);
-                }
-            }
-        }else {
-        printf("X's turn: "); //UI to show whos turn it currently is on
-        getl(buffer, CHAR_LIM); //user input between 1 and 9 for board placement;
-        int num = bufferToNum(buffer);        
-        while (num <= 0 || num > 9){ //checks for valid user input e.g non-number or out of range
-            printf("Please enter an integer between 1 and 9: ");
-            getl(buffer, CHAR_LIM);
-            num = bufferToNum(buffer);//converts char input to integer to allow for range validity           
-            }
-            if (putInBoard(board, num-1, turn)){ //boardspace is empty and can be placed
-                ;
-            } else {            
-                while(!putInBoard(board, num-1, turn)){ //prevents override of board placement
-                    printf("Something already exists, Please enter a new number: ");
-                    getl(buffer, CHAR_LIM);
-                    num = bufferToNum(buffer);
-                }
-            }
-        }     
-        printBoard();                
-        altTurn();
-        int gs = gameState(board);
-        if (gs == X){
-            printf("X won!");
-            return 0;
-        } else if (gs == O){
-            printf("O won!");
-            return 0;
-        } else if (gs == 0){
-            printf("Draw!");
-            return 0;        
-        }
-    
-    }
-    return 0;
-
-//to here
-    }else{ // PVE
-    printBoard(); //prints the board
-    int gameOn = 0; //ensures game is turned on
-    char buffer[CHAR_LIM]; //allows for input limit of CHAR_LIM
-    int hardness;// = difficulty()+1;
-    while(!gameOn){
-        if (turn == O){ //our turn
-            printf("%c's turn: ", turn == X ? 'X' : 'O'); //UI to show whos turn it currently is on
-            getl(buffer, CHAR_LIM); //user input between 1 and 9 for board placement;
-            int num = bufferToNum(buffer);        
-            while (num <= 0 || num > 9){ //checks for valid user input e.g non-number or out of range
-                printf("Please enter an integer between 1 and 9: ");
-                getl(buffer, CHAR_LIM);
-                num = bufferToNum(buffer);//converts char input to integer to allow for range validity           
-            }
-            if (putInBoard(board, num-1, turn)){ //boardspace is empty and can be placed
-                ;
-            } else {            
-                while(!putInBoard(board, num-1, turn)){ //prevents override of board placement
-                    printf("Something already exists, Please enter a new number: ");
-                    getl(buffer, CHAR_LIM);
-                    num = bufferToNum(buffer);
-                }
-            }
-            
-        } else {
-            int random = rand()%hardness; //sets difficulty level by user input
-            //printf("1\n",hardness);
-            //printf("2\n",random);
-            printf("Computer is thinking...\n");
-            delay(1);
-
-
-            if(random !=1){ //makes all non-1 values be the smart move
-                //printf("3");
-                putInBoard(board,ai(board, 8), X);
-                printf("Calculated %d types of outputs\n", output);
-                output = 0;    
-            }
-            else{
-                putInBoard(board, badai(board, 8), X);
-            }    
-        }
-        
-        printBoard();                
-        altTurn();
-        int gs = gameState(board);
-        if (gs == X){
-            printf("X won!");
-            return 0;
-        } else if (gs == O){
-            printf("O won!");
-            return 0;
-        } else if (gs == 0){
-            printf("Draw!");
-            return 0;
-        }           
-    }
-}    
-    return 0;
+    return status;
 }
