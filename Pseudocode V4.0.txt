@@ -1,0 +1,43 @@
+FUNCTION gameLogic(board, mode)
+    gs <-- gameState(board)
+    IF (gs == X)
+        tictactoeWindow(board, turn, 'X')
+        PRINT "X won!"
+    END IF
+    ELSE IF (gs == O)
+        tictactoeWindow(board, turn, 'O')
+        PRINT "O won!"
+    END IF
+    ELSE IF (gs == 0)
+        tictactoeWindow (board, turn, 'D');
+        PRINT "it is a draw!"
+    END IF
+    ELSE
+        IF (mode == 1)
+            altTurn()
+            tictactoeWindow(board, turn, ' ')
+        END IF
+        ELSE
+            altTurn()
+            PRINT "Player X or O Turn"
+            IF (turn == O)
+                tictactoeWindow(board, turn, ' ')
+            END IF
+            ELSE
+                random <-- rand() % difficulty
+                PRINT random generated value
+                PRINT "Computer is thinking"
+                delay(delay value)
+                IF (random != 1)
+                    rand() % difficulty
+                    PRINT output
+                    output <-- 0
+                END IF
+                ELSE
+                    putInBoard(board, badai(board, 8), X)
+                END IF
+                gameLogic(board, mode)
+            END IF
+        END IF
+    END IF
+END FUNCTION

@@ -347,36 +347,46 @@ void gameLogic(int board[], int mode){
     int gs = gameState(board);
 
     // if there is a winner tictactoeWindow() is called
-    if (gs == X){
+    if (gs == X)
+    {
         tictactoeWindow(board, turn, 'X'); // X is the winner
         printf("X won! \n");
-    } else if (gs == O){
+    } 
+    else if (gs == O)
+    {
         tictactoeWindow(board, turn, 'O'); // O is the winner
         printf("O won! \n");
-    } else if (gs == 0){
-        tictactoeWindow(board, turn, 'D'); // It is a draw
     } 
-
+    else if (gs == 0)
+    {
+        tictactoeWindow(board, turn, 'D'); // It is a draw
+        printf("It is a draw!");
+    } 
     // There is no winner therefore the game continues
-    else{
+    else
+    {
         // if Player vs Player 
-        if (mode == 1) {
+        if (mode == 1) 
+        {
             altTurn(); // Switch player turns
             tictactoeWindow(board, turn, ' '); // Display the board
         } 
         
         // else Player vs AI
-        else { 
+        else 
+        { 
             altTurn(); // Switch player turns
             printf("%d's Turn\n", turn);
 
             // if the current player is the user
-            if (turn == O){
+            if (turn == O)
+            {
                 tictactoeWindow(board, turn, ' ');
             }
 
             // else the current player is the AI 
-            else {
+            else 
+            {
                 int random = rand() % difficulty; // sets difficulty level by user input
                 printf("random = %d \n", random);
                 // printf("1\n",hardness);
