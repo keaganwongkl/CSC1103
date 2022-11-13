@@ -399,11 +399,13 @@ void gameLogic(int board[], int mode){
                     putInBoard(board, ai(board, 8), X);
                     printf("Calculated %d types of outputs\n", output);
                     output = 0;
-                } else{
+                } 
+                else
+                {
                     putInBoard(board, badai(board, 8), X);
                 }
                 gameLogic(board, mode); // re-runs gameLogic as AI has made its move
-            }
+            }// Else if the player is an AI
         }
     }
 }
