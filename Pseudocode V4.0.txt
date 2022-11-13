@@ -1,3 +1,28 @@
+Pseudo Code Done:
+- delay
+- curBoard
+- gameLogic
+- bufferToNum
+- boardToChar
+- altTurn
+- draw
+-- To Be Continued --
+
+FUNCTION delay(number_of_seconds)
+    milli_seconds <-- 1000 * number_of_seconds
+    start_time <-- clock()
+    WHILE (clock() < start_time + milli_seconds)
+
+    END WHILE
+END FUNCTION
+
+FUNCTION curBoard(int from[], int to[])
+    FOR(int i = 0; i < 9; i++)
+        to[i] <-- from[i]
+    END FOR
+END FUNCTION
+
+
 FUNCTION gameLogic(board, mode)
     gs <-- gameState(board)
     IF (gs == X)
@@ -40,4 +65,45 @@ FUNCTION gameLogic(board, mode)
             END IF
         END IF
     END IF
+END FUNCTION
+
+
+FUNCTION bufferToNum(buffer[])
+    n <-- 0 
+    FOR i = 0 to list length do
+        n <-- 10 * n + buffer[i] - '0'
+    END FOR
+    return n
+END FUNCTION
+
+FUNCTION boardToChar(i)
+    a <-- board[i]
+    IF a == X do
+        return 'X'
+    END IF
+    ELSE IF a == O do
+        return 'O'
+    END IF
+    ELSE
+        return a + '0'
+    END IF
+END FUNCTION
+
+
+FUNCTION altTurn
+    IF turn == O do 
+        turn <-- x
+    END IF
+    ELSE IF turn == X do
+        turn <-- O
+    END IF 
+END FUNCTION
+
+FUNCTION draw(l_board[])
+    FOR i = o to i = 8 do
+        IF (l_board[i] == i+1) do
+            return 0;
+        END IF
+    END FOR
+    return 1;
 END FUNCTION
