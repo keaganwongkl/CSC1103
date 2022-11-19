@@ -344,3 +344,21 @@ FUNCTION tictactoeWindow(int board[], int turn, char state)
     GTK_WINDOW display window
 ENDFUNCTION
 
+FUNCTION difficultyOnClick(GtkButton *button, gpointer data)
+    *text <- GTK_BUTTON get the label of the button
+    difficulty <- bufferToNum(text) + 1
+	PRINT difficulty
+    gameLogic(board, mode)
+ENDFUNCTION
+
+FUNCTION difficultySelectWindow()
+    GTK_GRID assign a grid to the window
+    GTK_LABEL display label with "Choose a difficulty" as text
+    GTK_GRID attach GTK_LABEL to (0,0) cordinates of grid
+    FOR int i = 1 to 5 do
+        GTK_BUTTON display button with i as text
+        GTK_BUTTON set button click action to trigger difficultyOnClick()
+        GTK_GRID attach GTK_BUTTON to (i-1,1) cordinates of grid
+    ENDFOR
+    GTK_WINDOW display window
+ENDFUNCTION
