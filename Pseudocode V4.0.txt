@@ -281,3 +281,66 @@ FUNCTION largemin(l_board[], depth, maximising)
     END IF
 END FUNCTION
 
+FUNCTION boxOnClick(GtkButton *button, gpointer data)
+    *text <- GTK_BUTTON get the identifier of the button
+    num <- bufferToNum(text)
+	PRINT num
+    IF putInBoard(board, num-1, turn) 
+        gameLogic(board, mode)
+    ENDIF
+ENDFUNCTION
+
+FUNCTION returnOnClick(GtkButton *button, gpointer data)
+    turn <- X
+	FOR i = 1 to 9 do
+        board[i-1] <- i
+    ENDFOR
+    mainWindow(); 
+ENDFUNCTION
+
+FUNCTION tictactoeWindow(int board[], int turn, char state)
+    GTK_GRID assign a grid to the window
+    FOR i = 0 to 8 do
+        str[2] <- { boardToChar(i) }
+        IF boardToChar(i) = 'X' or boardToChar(i) = 'O'
+            GTK_BUTTON display button with str as text
+            GTK_BUTTON assign the identifier str to the button
+            GTK_BUTTON disable button press
+        ELSE
+            GTK_BUTTON display button with " " as text
+            GTK_BUTTON assign the identifier str to the button
+            GTK_BUTTON enable button press
+        ENDIF
+		GTK_BUTTON set button click action to trigger boxOnClick()
+        IF state != ' '
+            GTK_BUTTON disable button press
+        ENDIF
+        x <- i % 3
+		IF i < 9 
+            y <- 2
+        ENDIF
+		IF i < 6
+            y <- 1
+        ENDIF
+		IF i < 3 
+            y <- 0
+        ENDIF
+		GTK_GRID attach GTK_BUTTON to (x,y) cordinates of grid
+	ENDFOR
+    IF state = ' '
+        message <- "Player " + turn + "'s turn"
+    ELSE
+        IF state = 'D'
+            message <- "It's a Draw!"
+        ELSE
+            message <- "Player " + state + " Won!"
+        ENDIF
+        GTK_BUTTON display button with "Return" as text
+		GTK_BUTTON set button click action to trigger returnOnClick()
+		GTK_GRID attach GTK_BUTTON to (0,4) cordinates of grid
+    ENDIF
+    GTK_LABEL display label with message as text
+    GTK_GRID attach GTK_LABEL to (0,3) cordinates of grid
+    GTK_WINDOW display window
+ENDFUNCTION
+
