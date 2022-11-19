@@ -3,6 +3,11 @@
 
 This is a simple Tic-tac-toe game built by 5 SIT Computing Science students. This game is written with C with GTK UI libraries. The game is compatible with both Mac and Windows machines.
 
+## Installation of dependencies for Windows
+```
+BLANK
+```
+
 ## Installation of dependencies for Mac
 Installation of Homebrew package manager to install GTK and pkg-config
 ```
