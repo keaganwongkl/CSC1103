@@ -1,7 +1,6 @@
 Pseudo Code Done:
 - delay
 - curBoard
-- gameLogic
 - bufferToNum
 - boardToChar
 - altTurn
@@ -14,11 +13,19 @@ Pseudo Code Done:
 - min
 - minimax
 - largemin
+-
+-
+- gameLogic
 - boxOnClick
 - returnOnClick
 - tictactoeWindow
 - difficultyOnClick
 - difficultySelectWindow
+-
+-
+-
+-
+-
 
 FUNCTION delay(number_of_seconds)
     milli_seconds <-- 1000 * number_of_seconds

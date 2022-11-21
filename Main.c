@@ -24,10 +24,10 @@ GtkWidget *window; // Main window used for UI
 
 void delay(int number_of_seconds);
 void curBoard(int from[], int to[]);
-int getl(char s[], int lim);
+// int getl(char s[], int lim);
 int bufferToNum(char buffer[]);
 char boardToChar(int i);
-void printBoard();
+// void printBoard();
 void altTurn();
 int draw(int l_board[]);
 int win(int l_board[]);
@@ -41,6 +41,7 @@ int largemin(int l_board[], int depth, int maximising);
 int ai(int l_board[], int depth);
 int badai(int l_board[], int depth);
 void gameLogic(int board[], int mode);
+void boxOnClick(GtkButton *button, gpointer data)
 void returnOnClick(GtkButton *button, gpointer data);
 void tictactoeWindow(int board[], int turn, char state);
 void difficultyOnClick(GtkButton *button, gpointer data);
