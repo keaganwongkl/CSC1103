@@ -1,4 +1,5 @@
 // To compile, run gcc $(pkg-config --cflags gtk4) -o main main.c $(pkg-config --libs gtk4)
+// To compile for windows, check README.txt for windows
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +42,8 @@ int largemin(int l_board[], int depth, int maximising);
 int ai(int l_board[], int depth);
 int badai(int l_board[], int depth);
 void gameLogic(int board[], int mode);
-void boxOnClick(GtkButton *button, gpointer data) void returnOnClick(GtkButton *button, gpointer data);
+void boxOnClick(GtkButton *button, gpointer data);
+void returnOnClick(GtkButton *button, gpointer data);
 void tictactoeWindow(int board[], int turn, char state);
 void difficultyOnClick(GtkButton *button, gpointer data);
 void difficultySelectWindow();
@@ -60,8 +62,7 @@ void delay(int number_of_seconds)
     clock_t start_time = clock();
 
     // looping till required time is not achieved
-    while (clock() < start_time + milli_seconds)
-        ;
+    while (clock() < start_time + milli_seconds);
 }
 
 void curBoard(int from[], int to[])
@@ -397,22 +398,22 @@ int ai(int l_board[], int depth)
 
 int badai(int l_board[], int depth)
 { // uses current boardstate to find the best possible moves
-    int legalMovesArr[9];
-    legalMoves(board, legalMovesArr);
-    int val = -100;
-    int worst_move = 0;
-    for (int i = 0; i < 9; i++)
+    int legalMovesArr[9];                                           //uses current boardstate to find the best possible moves
+    legalMoves(board, legalMovesArr);                               //creates an array to correspond if the spot in the board is empty or filled
+    int val = -100;                                                 //fills the legalmovesarray with 1 or 0's and checks with the current board state whether if it is already filled or not
+    int worst_move = 0;                                             //set the initial best move to -100
+    for (int i = 0; i < 9; i++)                                     //set local value to 0 to avoid garbage values
     {
-        if (legalMovesArr[i])
+        if (legalMovesArr[i])                                       //checks if theres any moves left
         {
-            int tempBoard[9];
-            curBoard(l_board, tempBoard);
-            putInBoard(tempBoard, i, X);
-            int temp = largemin(tempBoard, depth - 1, 0);
-            if (val <= temp)
-            {
-                val = temp;
-                worst_move = i;
+            int tempBoard[9];                                       //creates a temporary board for the local function
+            curBoard(l_board, tempBoard);                           //fill this temp board to be what the current board state is
+            putInBoard(tempBoard, i, X);                            //update the board state to the next with an 'X'
+            int temp = largemin(tempBoard, depth - 1, 0);           //pass in a 0 so maximizing is false and we always return the minimum minimizing
+            if (val <= temp)                                        //val will always be <= temp because largemin returns value -10 (minimum minimizing value)
+            {               
+                val = temp;                                         //set temp value into val
+                worst_move = i;                                     //puts in the board[] array on the 0th index to 8th index
             }
         }
     }
