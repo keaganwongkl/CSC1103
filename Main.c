@@ -1,4 +1,5 @@
-// To compile, check README.txt
+// To compile for mac, check the README.md file
+// To compile for windows, check README.txt file
 
 #include <stdio.h>
 #include <stdlib.h>
