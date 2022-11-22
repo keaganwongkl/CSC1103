@@ -1,0 +1,456 @@
+Pseudo Code Done:
+- delay
+- curBoard
+- bufferToNum
+- boardToChar
+- altTurn
+- draw
+- win
+- putInBoard
+- gameState
+- legalMoves
+- max
+- min
+- minimax
+- largemin
+- ai
+- badai
+- gameLogic
+- boxOnClick
+- returnOnClick
+- tictactoeWindow
+- difficultyOnClick
+- difficultySelectWindow
+- oneplayerpressed
+- twoplayerpressed
+- mainWindow
+- activate
+- main
+
+FUNCTION delay(number_of_seconds)
+    milli_seconds <- 1000 * number_of_seconds
+    start_time <- clock()
+    WHILE (clock() < start_time + milli_seconds)
+
+    END WHILE
+END FUNCTION
+
+FUNCTION curBoard(int from[], int to[])
+    FOR(int i = 0; i < 9; i++)
+        to[i] <-- from[i]
+    END FOR
+END FUNCTION
+
+FUNCTION ai(int l_board[], int depth)
+    int legalMovesArr[size 9]
+    legalMoves(board, legalMovesArr)
+    val <- 100
+    best_move <- 0
+    FOR i=0 to i<9
+        IF legalMovesArr[i]
+            int tempboard[size 9]
+            curBoard(l_board, tempBoard)
+            putInBoard(tempBoard, i ,X)
+            int temp = largemin(tempBoard, depth-1, 0)
+            IF (val <= temp)
+                val <- temp
+                best_move <- i
+            END IF
+        END IF
+    END FOR
+    RETURN best_move
+END FUNCTION
+
+FUNCTION badai(int l_board[], int depth)
+    int legalMovesArr[size 9]
+    legalMoves(board, legalMovesArr)
+    val <- -100
+    worst_move <- 0
+    FOR i=0 to i<9
+        IF legalMovesArr[i]
+            int tempboard[size 9]
+            curBoard(l_board, tempBoard)
+            putInBoard(tempBoard, i ,X)
+            int temp = largemin(tempBoard, depth-1, 0)
+            IF (val <= temp)
+                val <- temp
+                worst_move <- i
+            END IF
+        END IF
+    END FOR
+    RETURN worst_move
+END FUNCTION
+
+FUNCTION gameLogic(board, mode)
+    gs <-- gameState(board)
+    IF (gs == X)
+        tictactoeWindow(board, turn, 'X')
+        PRINT "X won!"
+    END IF
+    ELSE IF (gs == O)
+        tictactoeWindow(board, turn, 'O')
+        PRINT "O won!"
+    END IF
+    ELSE IF (gs == 0)
+        tictactoeWindow (board, turn, 'D');
+        PRINT "it is a draw!"
+    END IF
+    ELSE
+        IF (mode == 1)
+            altTurn()
+            tictactoeWindow(board, turn, ' ')
+        END IF
+        ELSE
+            altTurn()
+            PRINT "Player X or O Turn"
+            IF (turn == O)
+                tictactoeWindow(board, turn, ' ')
+            END IF
+            ELSE
+                random <- rand() % difficulty
+                PRINT random generated value
+                PRINT "Computer is thinking"
+                delay(delay value)
+                IF (random != 1)
+                    rand() % difficulty
+                    PRINT output
+                    output <- 0
+                END IF
+                ELSE
+                    putInBoard(board, badai(board, 8), X)
+                END IF
+                gameLogic(board, mode)
+            END IF
+        END IF
+    END IF
+END FUNCTION
+
+
+FUNCTION bufferToNum(buffer[])
+    n <- 0 
+    FOR i = 0 to list length do
+        n <- 10 * n + buffer[i] - '0'
+    END FOR
+    return n
+END FUNCTION
+
+FUNCTION boardToChar(i)
+    a <- board[i]
+    IF a == X do
+        return 'X'
+    END IF
+    ELSE IF a == O do
+        return 'O'
+    END IF
+    ELSE
+        return a + '0'
+    END IF
+END FUNCTION
+
+
+FUNCTION altTurn
+    IF turn == O do 
+        turn <- x
+    END IF
+    ELSE IF turn == X do
+        turn <- O
+    END IF 
+END FUNCTION
+
+FUNCTION draw(l_board[])
+    FOR i = o to i = 8 do
+        IF (l_board[i] == i+1) do
+            return 0;
+        END IF
+    END FOR
+    return 1;
+END FUNCTION
+
+FUNCTION win(l_board[])
+    FOR i = 0 to 2 do
+        IF (l_board[3*i] == l_board[3*i + 1] && l_board[3*i + 1] == l_board[3*i + 2])
+            return l_board[3*i]
+        END IF
+    END FOR
+    FOR i = 0 to 2 do
+        IF (l_board[j] == l_board[3 + j] && l_board[3 + j] == l_board[6 + j])
+            return l_board[j]
+        END IF
+    END FOR
+    IF (l_board[0] == l_board[4] && l_board[0] == l_board[8])
+        return l_board[0]
+    END IF
+    IF (l_board[2] == l_board[4] && l_board[2] == l_board[6])
+        return l_board[2]
+    END IF
+    return 0
+END FUNCTION
+
+FUNCTION putInBoard(l_board[], pos, newVal)
+    IF (l_board[pos] == pos+1)
+        l_board[pos] = newVal
+        return 1
+    END IF
+    ELSE
+        return 0
+    END IF
+END FUNCTION
+
+FUNCTION gameState(l_board[])
+    wc <- win(l_board)
+    IF (wc == X)
+        return x
+    END IF
+    ELSE IF(wc == O)
+        return O
+    END IF
+    ELSE
+        IF draw(l_board)
+            return 0
+        END IF
+    END IF
+    return 1
+END FUNCTION
+
+FUNCTION legalMoves(l_board[], output[])
+    FOR i = 0 to 8
+        IF (l_board[i] == i+1)
+            output[i] = 1
+        END IF
+        ELSE
+            output[i] =  0
+        END IF
+    END FOR
+END FUNCTION
+
+FUNCTION max(a, b)
+    IF a>b
+        return a
+    END IF
+    ELSE
+        return b
+    END IF
+END FUNCTION
+
+FUNCTION min(a, b)
+    IF a<b
+        return a
+    END IF
+    ELSE
+        return b
+    END IF
+END FUNCTION
+
+FUNCTION minimax(l_board[], depth, maximising)
+    gs <- gameState(l_board)
+    output <- output + 1
+    IF gs == X
+        return 10
+    END IF
+    ELSE IF gs == O
+        return -10
+    END IF
+    ELSE IF gs == 0
+        return 0
+    END IF
+    IF depth == 0 do
+        return 0
+    END IF
+    IF (maximising)
+        val <- -100
+        legalMovesArr[9]
+        legalMoves(l_board, legalMovesArr)
+        FOR i = 0 to i = 8 do
+            IF (legalMovesArr[i])
+                tempBoard[9]
+                curBoard(l_board, tempBoard)
+                putInBoard(tempBoard, i, X)
+                val = max(minimax(tempBoard, depth-1, 0), val)
+            END IF
+        END FOR 
+        return val
+    END IF
+    ELSE
+        val <- 100
+        legalMovesArr[9]
+        legalMoves(l_board, legalMovesArr)
+        FOR i = 0 to i = 8 do 
+            IF (legalMovesArr[i])
+                tempBoard[9]
+                curBoard(l_board, tempBoard)
+                putInBoard(tempBoard, i, O)
+                val = min(minimax(tempBoard, depth-1, 1), val)
+            END IF
+        END FOR
+        return val
+    END IF
+END FUNCTION
+    
+FUNCTION largemin(l_board[], depth, maximising)
+    gs <- gameState(l_board)
+    output <- output + 1
+    IF(gs == O)
+        return 10;
+    END IF
+    ELSE IF (gs == X)
+        return -10
+    END IF
+    ELSE IF (gs == 0)
+        return 0
+    END IF
+    IF (depth == 0)
+        return 0;
+    END IF
+    IF (maximise)
+        val <- -100
+        legalMovesArr[9]
+        legalMoves(l_board, legalMovesArr)
+        FOR i = 0 to i = 8 do
+            IF (legalMovesArr[i])
+                tempBoard[9]
+                curBoard(l_board, tempBoard)
+                putInBoard(tempBoard, i, X)
+                val = max(largemin(tempBoard, depth-1, 0), val)
+            END IF
+        END FOR
+        return val
+    END IF
+    ELSE 
+        val = 100
+        legalMovesArr[9]
+        legalMoves(l_board, legalMovesArr)
+        FOR i = 0 to i = 8 do
+            IF (legalMovesArr[i])
+                int tempBoard[9]
+                curBoard(l_board, tempBoard)
+                putInBoard(tempBoard, i, O)
+                val = min(largemin(tempBoard, depth-1, 1), val)
+            END IF
+        END FOR
+        return val
+    END IF
+END FUNCTION
+
+
+
+FUNCTION boxOnClick(GtkButton *button, gpointer data)
+    *text <- GTK_BUTTON get the identifier of the button
+    num <- bufferToNum(text)
+	PRINT num
+    IF putInBoard(board, num-1, turn) 
+        gameLogic(board, mode)
+    ENDIF
+ENDFUNCTION
+
+FUNCTION returnOnClick(GtkButton *button, gpointer data)
+    turn <- X
+	FOR i = 1 to 9 do
+        board[i-1] <- i
+    ENDFOR
+    mainWindow(); 
+ENDFUNCTION
+
+FUNCTION tictactoeWindow(int board[], int turn, char state)
+    GTK_GRID assign a grid to the window
+    FOR i = 0 to 8 do
+        str[2] <- { boardToChar(i) }
+        IF boardToChar(i) = 'X' or boardToChar(i) = 'O'
+            GTK_BUTTON display button with str as text
+            GTK_BUTTON assign the identifier str to the button
+            GTK_BUTTON disable button press
+        ELSE
+            GTK_BUTTON display button with " " as text
+            GTK_BUTTON assign the identifier str to the button
+            GTK_BUTTON enable button press
+        ENDIF
+		GTK_BUTTON set button click action to trigger boxOnClick()
+        IF state != ' '
+            GTK_BUTTON disable button press
+        ENDIF
+        x <- i % 3
+		IF i < 9 
+            y <- 2
+        ENDIF
+		IF i < 6
+            y <- 1
+        ENDIF
+		IF i < 3 
+            y <- 0
+        ENDIF
+		GTK_GRID attach GTK_BUTTON to (x,y) cordinates of grid
+	ENDFOR
+    IF state = ' '
+        message <- "Player " + turn + "'s turn"
+    ELSE
+        IF state = 'D'
+            message <- "It's a Draw!"
+        ELSE
+            message <- "Player " + state + " Won!"
+        ENDIF
+        GTK_BUTTON display button with "Return" as text
+		GTK_BUTTON set button click action to trigger returnOnClick()
+		GTK_GRID attach GTK_BUTTON to (0,4) cordinates of grid
+    ENDIF
+    GTK_LABEL display label with message as text
+    GTK_GRID attach GTK_LABEL to (0,3) cordinates of grid
+    GTK_WINDOW display window
+ENDFUNCTION
+
+FUNCTION difficultyOnClick(GtkButton *button, gpointer data)
+    *text <- GTK_BUTTON get the label of the button
+    difficulty <- bufferToNum(text) + 1
+	PRINT difficulty
+    gameLogic(board, mode)
+ENDFUNCTION
+
+FUNCTION difficultySelectWindow()
+    GTK_GRID assign a grid to the window
+    GTK_LABEL display label with "Choose a difficulty" as text
+    GTK_GRID attach GTK_LABEL to (0,0) cordinates of grid
+    FOR int i = 1 to 5 do
+        GTK_BUTTON display button with i as text
+        GTK_BUTTON set button click action to trigger difficultyOnClick()
+        GTK_GRID attach GTK_BUTTON to (i-1,1) cordinates of grid
+    ENDFOR
+    GTK_WINDOW display window
+ENDFUNCTION
+
+FUNCTION oneplayerpressed (Gtkwidget *widget, gpointer data)
+    mode <- 2
+    PRINT "Single player mode chosen"
+    difficultySelectWindow()
+END FUNCTION
+
+FUNCTION twoplayerpressed (GtkWidget *widget, gpointer data)
+    mode <- 1
+    PRINT "Two player mode chosen"
+    gameLogic(board, mode)
+END FUNCTION
+
+FUNCTION mainWindow()
+    GTK_GRID assign a grid to the window
+		GTK_oneplayer assign a button to the grid
+			GTK_oneplayer display button with "Player vs AI" text
+			GTK_oneplayer set button click action to trigger oneplayerpressed
+			GTK_GRID attach GTK_oneplayer to (0,0) cordinates of grid
+		GTK_twoplayer assign a button to the grid
+			GTK_twoplayer display button with "Player vs Player" text
+			GTK_twoplayer set button click action to trigger twoplayerpressed
+			GTK_GRID attach GTK_twoplayer to (0,1) cordinates of grid
+END FUNCTION
+
+FUNCTION activate (GtkApplication* app, gpointer user_data)
+	GTK_WINDOW create a new window 
+	GTK_WINDOW display title "Tic Tac Toe"
+	GTK_WINDOW size of 300 length, 150 vertical
+	show GTK_WINDOW
+    mainWindow();
+END FUNCTION
+
+BEGIN
+	set G_APPLICATION as new application
+	G_APPLICATION activate application
+	status <- run G_APPLICATION
+	g_object_unref
+	return status
+END
