@@ -1,4 +1,5 @@
-// To compile, check README.txt
+// To compile for mac, check the README.md file
+// To compile for windows, check README.txt file
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,14 +107,12 @@ void mainWindow()
 void oneplayerpressed(GtkWidget *widget, gpointer data)
 {
     mode = 2;
-    g_print("Single player mode chosen\n");
     difficultySelectWindow();
 }
 
 void twoplayerpressed(GtkWidget *widget, gpointer data)
 {
     mode = 1;
-    g_print("Two player mode chosen\n");
     gameLogic(board, mode);
 }
 
@@ -154,7 +153,6 @@ void difficultyOnClick(GtkButton *button, gpointer data)
     // Recieves the name of the button
     gchar *text = gtk_button_get_label(button);
     difficulty = bufferToNum(text) + 1; // Sets the difficulty level +1 based on the button clicked
-    printf("Difficulty: %d\n", difficulty);
     gameLogic(board, mode); // Starts the game
 }
 
@@ -245,7 +243,6 @@ void boxOnClick(GtkButton *button, gpointer data)
 {
     gchar *text = gtk_widget_get_name(button); // Recieves the name of the box
     int num = bufferToNum(text);
-    printf("Grid box: %d\n", num);
     if (putInBoard(board, num - 1, turn))
     { // Ensures that the move is valid and is made
         gameLogic(board, mode);
@@ -285,17 +282,14 @@ void gameLogic(int board[], int mode)
     if (gs == X)
     {
         tictactoeWindow(board, turn, 'X'); // X is the winner
-        printf("X won! \n");
     }
     else if (gs == O)
     {
         tictactoeWindow(board, turn, 'O'); // O is the winner
-        printf("O won! \n");
     }
     else if (gs == 0)
     {
         tictactoeWindow(board, turn, 'D'); // It is a draw
-        printf("It is a draw!");
     }
     // There is no winner therefore the game continues
     else
@@ -311,7 +305,6 @@ void gameLogic(int board[], int mode)
         else
         {
             altTurn(); // Switch player turns
-            printf("%d's Turn\n", turn);
 
             // if the current player is the user
             if (turn == O)
@@ -323,13 +316,10 @@ void gameLogic(int board[], int mode)
             else
             {
                 int random = rand() % difficulty; // sets difficulty level by user input
-                printf("random = %d \n", random);
-                printf("Computer is thinking...\n");
                 delay(1);
                 if (difficulty == 6)
                 {
                     putInBoard(board, ai(board, 6), X);
-                    printf("Calculated %d types of outputs\n", output);
                     output = 0;
                     gameLogic(board, mode);
                 }
@@ -342,7 +332,6 @@ void gameLogic(int board[], int mode)
                 else if (difficulty == 3)
                 { // lvl 2
                     putInBoard(board, badai(board, 1), X);
-                    printf("Calculated %d types of outputs\n", output);
                     output = 0;
                     gameLogic(board, mode);
                 }
@@ -351,7 +340,6 @@ void gameLogic(int board[], int mode)
                     if (random != 1)
                     { // makes all non-1 values be the smart move
                         putInBoard(board, ai(board, 4), X);
-                        printf("Calculated %d types of outputs\n", output);
                         output = 0;
                     }
                     else
