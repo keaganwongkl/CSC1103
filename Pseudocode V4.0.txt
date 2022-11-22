@@ -447,10 +447,10 @@ FUNCTION activate (GtkApplication* app, gpointer user_data)
     mainWindow();
 END FUNCTION
 
-FUNCTION main(void)(GtkApplication *app)
+BEGIN
 	set G_APPLICATION as new application
 	G_APPLICATION activate application
 	status <- run G_APPLICATION
 	g_object_unref
 	return status
-END FUNCTION
+END
