@@ -450,7 +450,7 @@ END FUNCTION
 FUNCTION main(void)(GtkApplication *app)
 	set G_APPLICATION as new application
 	G_APPLICATION activate application
-	status <-- run G_APPLICATION
+	status <- run G_APPLICATION
 	g_object_unref
 	return status
 END FUNCTION
