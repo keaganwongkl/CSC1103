@@ -13,7 +13,7 @@ Pseudo Code Done:
 - min
 - minimax
 - largemin
--
+- ai
 - badai
 - gameLogic
 - boxOnClick
