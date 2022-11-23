@@ -69,6 +69,7 @@ int main(int argc, char **argv)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+// Initialised when the UI is started
 static void activate(GtkApplication *app, gpointer user_data)
 {
     // new window with title//
@@ -79,6 +80,7 @@ static void activate(GtkApplication *app, gpointer user_data)
     mainWindow();
 }
 
+// Main menu window for the UI
 void mainWindow()
 {
     GtkWidget *grid;
@@ -106,12 +108,14 @@ void mainWindow()
 
 void oneplayerpressed(GtkWidget *widget, gpointer data)
 {
+    // Sets the gamemode to player vs ai and opens the difficulty select window
     mode = 2;
     difficultySelectWindow();
 }
 
 void twoplayerpressed(GtkWidget *widget, gpointer data)
 {
+    // Sets the gamemode to player vs player and opens the game window
     mode = 1;
     gameLogic(board, mode);
 }
