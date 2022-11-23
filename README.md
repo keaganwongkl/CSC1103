@@ -7,7 +7,7 @@ brew remove gtk+3
 brew install gtk4
 ```
 ### If you're using an Intel Mac
-The current version of the game is compiled on an ARM  Mac. If you are running an Intel Mac you may need to recompile the game.
+The current version of the game is compiled on an ARM Mac. If you are running an Intel Mac you may need to recompile the game.
 ## Installation of dependencies for Mac
 THis is a guide on how to install the GTK UI library for Mac. This is required to compile the and run the game.
 ### Install Homebrew
